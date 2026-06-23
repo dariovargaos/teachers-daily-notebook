@@ -13,6 +13,8 @@ export const useLogout = () => {
     try {
       // signOut triggers onAuthStateChanged with null in AuthContext
       await signOut(auth);
+
+      setIsPending(false);
     } catch (err) {
       setError((err as Error).message);
       setIsPending(false);

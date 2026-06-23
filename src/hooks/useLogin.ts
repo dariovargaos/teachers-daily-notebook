@@ -14,7 +14,8 @@ export const useLogin = () => {
       // signInWithEmailAndPassword triggers onAuthStateChanged in AuthContext
       // — no manual dispatch needed
       await signInWithEmailAndPassword(auth, email, password);
-      // Success: isPending stays true until redirect happens
+
+      setIsPending(false);
     } catch (err) {
       const code = (err as { code?: string }).code;
       switch (code) {

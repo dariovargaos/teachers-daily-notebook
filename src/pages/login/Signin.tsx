@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link as RouterLink } from "react-router";
+import { useLogin } from "../../hooks/useLogin";
 import {
   Box,
   Flex,
@@ -25,6 +26,15 @@ import {
 
 export default function Signin() {
   const [show, setShow] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const { login, error, isPending } = useLogin();
+
+  const handleSubmit = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    login(email, password);
+  };
 
   return (
     <Flex
@@ -229,14 +239,23 @@ export default function Signin() {
             mt={8}
             gap={5}
             align="stretch"
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={handleSubmit}
           >
+            {/* Error message */}
+            {error && (
+              <Text color="red.500" fontSize="sm" fontWeight="medium">
+                {error}
+              </Text>
+            )}
+
             {/* Email field */}
             <Field label="Email" icon={<LuMail />}>
               <Input
                 type="email"
                 required
                 placeholder="you@school.edu"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 variant="flushed"
                 fontSize="sm"
                 color="fg"
@@ -273,6 +292,8 @@ export default function Signin() {
                 type={show ? "text" : "password"}
                 required
                 placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 variant="flushed"
                 fontSize="sm"
                 color="fg"
@@ -304,6 +325,8 @@ export default function Signin() {
             {/* Submit button */}
             <Button
               type="submit"
+              loading={isPending}
+              disabled={isPending}
               colorPalette="primary"
               size="lg"
               borderRadius="2xl"
@@ -315,7 +338,7 @@ export default function Signin() {
               _active={{ transform: "scale(0.99)" }}
               boxShadow="0 18px 40px -20px oklch(0.2 0.05 50 / 0.6)"
             >
-              Sign in
+              {isPending ? "Signing in..." : "Sign in"}
               <LuArrowRight />
             </Button>
 

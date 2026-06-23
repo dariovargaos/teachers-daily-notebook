@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link as RouterLink } from "react-router";
+import { useSignup } from "../../hooks/useSignup";
 import {
   Box,
   Flex,
@@ -27,6 +28,16 @@ import {
 
 export default function Signup() {
   const [show, setShow] = useState(false);
+  const [displayName, setDisplayName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const { signup, error, isPending } = useSignup();
+
+  const handleSubmit = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    signup(email, password, displayName);
+  };
 
   return (
     <Flex
@@ -123,14 +134,23 @@ export default function Signup() {
             mt={8}
             gap={5}
             align="stretch"
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={handleSubmit}
           >
+            {/* Error message */}
+            {error && (
+              <Text color="red.500" fontSize="sm" fontWeight="medium">
+                {error}
+              </Text>
+            )}
+
             {/* Full name field */}
             <Field label="Full name" icon={<LuUser />}>
               <Input
                 type="text"
                 required
                 placeholder="Ms. Emma Johnson"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
                 variant="flushed"
                 fontSize="sm"
                 color="fg"
@@ -148,6 +168,8 @@ export default function Signup() {
                 type="email"
                 required
                 placeholder="you@school.edu"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 variant="flushed"
                 fontSize="sm"
                 color="fg"
@@ -185,6 +207,8 @@ export default function Signup() {
                 required
                 minLength={8}
                 placeholder="At least 8 characters"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 variant="flushed"
                 fontSize="sm"
                 color="gray.400"
@@ -226,6 +250,8 @@ export default function Signup() {
             {/* Submit button */}
             <Button
               type="submit"
+              loading={isPending}
+              disabled={isPending}
               colorPalette="primary"
               size="lg"
               borderRadius="2xl"
@@ -237,7 +263,7 @@ export default function Signup() {
               _active={{ transform: "scale(0.99)" }}
               boxShadow="0 18px 40px -20px oklch(0.2 0.05 50 / 0.6)"
             >
-              Create account
+              {isPending ? "Creating account..." : "Create account"}
               <LuArrowRight />
             </Button>
 

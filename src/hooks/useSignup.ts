@@ -31,6 +31,7 @@ export const useSignup = () => {
 
       // onAuthStateChanged in AuthContext picks up the new user automatically
       navigate("/");
+      setIsPending(false);
     } catch (err) {
       const code = (err as { code?: string }).code;
       switch (code) {
