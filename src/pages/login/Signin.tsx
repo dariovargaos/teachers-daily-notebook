@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { Link as RouterLink } from "react-router";
+import { useState, useEffect } from "react";
+import { Link as RouterLink, useNavigate } from "react-router";
 import { useLogin } from "../../hooks/useLogin";
+import { useAuthContext } from "../../hooks/useAuthContext";
 import {
   Box,
   Flex,
@@ -30,6 +31,15 @@ export default function Signin() {
   const [password, setPassword] = useState("");
 
   const { login, error, isPending } = useLogin();
+  const { user } = useAuthContext();
+  const navigate = useNavigate();
+
+  // Redirect to home once authenticated
+  useEffect(() => {
+    if (user) {
+      navigate("/", { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -272,8 +282,9 @@ export default function Signin() {
               label="Password"
               icon={<LuLock />}
               trailing={
-                <Box
-                  as="button"
+                <Button
+                  type="button"
+                  variant="plain"
                   onClick={() => setShow((s) => !s)}
                   color="fg.muted"
                   _hover={{ color: "fg" }}
@@ -283,9 +294,11 @@ export default function Signin() {
                   border="none"
                   cursor="pointer"
                   p={0}
+                  h="auto"
+                  minW={0}
                 >
                   {show ? <LuEyeOff /> : <LuEye />}
-                </Box>
+                </Button>
               }
             >
               <Input

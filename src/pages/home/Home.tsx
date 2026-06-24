@@ -15,7 +15,9 @@ import {
   LuNotebookPen,
   LuTrash2,
   LuPlus,
+  LuLogOut,
 } from "react-icons/lu";
+import { useLogout } from "@/hooks/useLogout";
 import Calendar from "@/components/calendar/Calendar";
 
 // ═══════════════════════════════════════════════════════════════
@@ -157,6 +159,7 @@ const sharedInputProps = {
 // ═══════════════════════════════════════════════════════════════
 
 export default function Home() {
+  const { logout, isPending } = useLogout();
   const [page, setPage] = useState<"roster" | "planner">("planner");
   const [date, setDate] = useState<Date>(() => {
     const d = new Date();
@@ -350,6 +353,29 @@ export default function Home() {
           transition="all 0.15s"
         >
           Roster
+        </Button>
+
+        {/* Logout */}
+        <Button
+          onClick={logout}
+          loading={isPending}
+          aria-label="Sign out"
+          variant="ghost"
+          minW={0}
+          rounded="full"
+          borderWidth="1px"
+          borderColor="border/70"
+          bg="card.solid/60"
+          color="muted.contrast"
+          _hover={{
+            color: "fg",
+            borderColor: "fg/30",
+          }}
+          _active={{ transform: "scale(0.95)" }}
+          transition="all 0.15s"
+        >
+          Log out
+          <LuLogOut />
         </Button>
       </Flex>
     </Flex>
