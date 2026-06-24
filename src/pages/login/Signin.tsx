@@ -230,7 +230,7 @@ export default function Signin() {
               textUnderlineOffset="4px"
               _hover={{ opacity: 0.8 }}
             >
-              <RouterLink to="/sign-up">Create one</RouterLink>
+              <RouterLink to="/signup">Create one</RouterLink>
             </Box>
           </Text>
 

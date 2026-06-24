@@ -47,6 +47,9 @@ export const useSignup = () => {
         case "auth/weak-password":
           setError("Password should be at least 6 characters.");
           break;
+        case "permission-denied":
+          setError("Unable to save your profile. Please try again.");
+          break;
         default:
           setError((err as Error).message);
       }

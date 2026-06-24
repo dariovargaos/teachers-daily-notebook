@@ -1,5 +1,7 @@
 {
   "projects": {
     "default": "skolski-rokovnik"
-  }
+  },
+  "targets": {},
+  "etags": {}
 }
