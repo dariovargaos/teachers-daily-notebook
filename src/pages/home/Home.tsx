@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useReducer } from "react";
+import { useMemo, useState, useCallback, useReducer, useEffect } from "react";
 import {
   Box,
   Button,
@@ -17,6 +17,9 @@ import {
   LuPlus,
   LuLogOut,
 } from "react-icons/lu";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/firebase/config";
+import { useAuthContext } from "@/hooks/useAuthContext";
 import { useLogout } from "@/hooks/useLogout";
 import Calendar from "@/components/calendar/Calendar";
 
@@ -160,6 +163,22 @@ const sharedInputProps = {
 
 export default function Home() {
   const { logout, isPending } = useLogout();
+  const { user } = useAuthContext();
+  const [teacherFirstName, setTeacherFirstName] = useState("");
+
+  // Fetch the teacher's first name from Firestore
+  useEffect(() => {
+    if (!user) return;
+    const fetchName = async () => {
+      const snap = await getDoc(doc(db, "users", user.uid));
+      if (snap.exists()) {
+        const data = snap.data();
+        setTeacherFirstName(data.firstName ?? "");
+      }
+    };
+    fetchName();
+  }, [user]);
+
   const [page, setPage] = useState<"roster" | "planner">("planner");
   const [date, setDate] = useState<Date>(() => {
     const d = new Date();
@@ -292,6 +311,16 @@ export default function Home() {
           <LuNotebookPen size="1.125rem" />
         </Flex>
         <Box lineHeight="tight">
+          {teacherFirstName && (
+            <Text
+              fontSize="xs"
+              fontWeight="medium"
+              color="muted.contrast"
+              mb={0.5}
+            >
+              Good day, {teacherFirstName}
+            </Text>
+          )}
           <Text
             textStyle="display"
             fontSize="sm"

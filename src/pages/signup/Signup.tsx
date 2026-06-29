@@ -29,7 +29,8 @@ import {
 
 export default function Signup() {
   const [show, setShow] = useState(false);
-  const [displayName, setDisplayName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -46,7 +47,7 @@ export default function Signup() {
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    signup(email, password, displayName);
+    signup(email, password, firstName.trim(), lastName.trim());
   };
 
   return (
@@ -153,18 +154,33 @@ export default function Signup() {
               </Text>
             )}
 
-            {/* Full name field */}
-            <Field label="Full name" icon={<LuUser />}>
+            {/* First name field */}
+            <Field label="First name" icon={<LuUser />}>
               <Input
                 type="text"
                 required
-                placeholder="Ms. Emma Johnson"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 variant="flushed"
                 fontSize="sm"
                 color="fg"
-                _placeholder={{ color: "fg.muted/60" }}
+                p={0}
+                border="none"
+                outline="none"
+                _focus={{ outline: "none" }}
+              />
+            </Field>
+
+            {/* Last name field */}
+            <Field label="Last name" icon={<LuUser />}>
+              <Input
+                type="text"
+                required
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                variant="flushed"
+                fontSize="sm"
+                color="fg"
                 p={0}
                 border="none"
                 outline="none"
@@ -177,7 +193,6 @@ export default function Signup() {
               <Input
                 type="email"
                 required
-                placeholder="you@school.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 variant="flushed"
@@ -219,12 +234,11 @@ export default function Signup() {
                 type={show ? "text" : "password"}
                 required
                 minLength={8}
-                placeholder="At least 8 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 variant="flushed"
                 fontSize="sm"
-                color="gray.400"
+                color="fg"
                 _placeholder={{ color: "fg.muted/60" }}
                 p={0}
                 border="none"
@@ -232,6 +246,30 @@ export default function Signup() {
                 _focus={{ outline: "none" }}
               />
             </Field>
+
+            {/* ── Password hint ── */}
+            <HStack gap={1.5} mt={-3} ml={1}>
+              {password.length >= 8 ? (
+                <>
+                  <LuCheck size="0.625rem" color="oklch(0.55 0.14 155)" />
+                  <Text
+                    fontSize="10px"
+                    color="fg.muted/50"
+                    letterSpacing="0.04em"
+                  >
+                    Good to go
+                  </Text>
+                </>
+              ) : (
+                <Text
+                  fontSize="10px"
+                  color="fg.muted/40"
+                  letterSpacing="0.04em"
+                >
+                  At least 8 characters
+                </Text>
+              )}
+            </HStack>
 
             {/* Terms checkbox */}
             <Checkbox.Root colorPalette="primary" variant="subtle" required>

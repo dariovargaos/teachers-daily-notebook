@@ -12,19 +12,23 @@ export const useSignup = () => {
   const signup = async (
     email: string,
     password: string,
-    displayName: string,
+    firstName: string,
+    lastName: string,
   ) => {
     setError(null);
     setIsPending(true);
 
     try {
       const res = await createUserWithEmailAndPassword(auth, email, password);
+      const displayName = `${firstName} ${lastName}`;
 
       // Set the display name on the auth profile
       await updateProfile(res.user, { displayName });
 
       // Create a user document in Firestore (keyed by UID for security rules)
       await setDoc(doc(db, "users", res.user.uid), {
+        firstName,
+        lastName,
         displayName,
         email,
       });

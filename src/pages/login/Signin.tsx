@@ -263,7 +263,6 @@ export default function Signin() {
               <Input
                 type="email"
                 required
-                placeholder="you@school.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 variant="flushed"
@@ -304,7 +303,6 @@ export default function Signin() {
               <Input
                 type={show ? "text" : "password"}
                 required
-                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 variant="flushed"
