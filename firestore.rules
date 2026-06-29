@@ -2,6 +2,16 @@ rules_version='2'
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Students: only the creating teacher can read/write their own
+    match /students/{studentId} {
+      allow read, write: if request.auth != null
+                        && resource.data.teacherId == request.auth.uid;
+      allow create: if request.auth != null
+                   && request.resource.data.teacherId == request.auth.uid;
+    }
+
+    // Keep existing open rules for other collections
     match /{document=**} {
       allow read, write;
     }

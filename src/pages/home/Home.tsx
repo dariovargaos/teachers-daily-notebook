@@ -21,6 +21,8 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { useAuthContext } from "@/hooks/useAuthContext";
 import { useLogout } from "@/hooks/useLogout";
+import { useCollection } from "@/hooks/useCollection";
+import { useFirestore } from "@/hooks/useFirestore";
 import Calendar from "@/components/calendar/Calendar";
 
 // ═══════════════════════════════════════════════════════════════
@@ -79,35 +81,12 @@ function saveEvents(events: Record<string, string>) {
   }
 }
 
-const ROSTER_KEY = "planner:roster";
-
 type Student = {
   id: string;
   firstName: string;
   lastName: string;
+  teacherId: string;
 };
-
-function generateId() {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
-}
-
-function loadRoster(): Student[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(ROSTER_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveRoster(students: Student[]) {
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem(ROSTER_KEY, JSON.stringify(students));
-  }
-}
 
 // ═══════════════════════════════════════════════════════════════
 // Shell — glassmorphism card wrapper
@@ -157,6 +136,8 @@ const sharedInputProps = {
   },
 };
 
+const STUDENT_ORDER = ["lastName", "firstName"] as const;
+
 // ═══════════════════════════════════════════════════════════════
 // PlannerPage — main component
 // ═══════════════════════════════════════════════════════════════
@@ -200,7 +181,16 @@ export default function Home() {
     forceUpdate(); // trigger re-render so notes reads the new value
   };
 
-  const [roster, setRoster] = useState<Student[]>(() => loadRoster());
+  const { docs: roster, loading: rosterLoading } = useCollection<Student>(
+    "students",
+    "teacherId",
+    STUDENT_ORDER,
+  );
+  const {
+    addDocument,
+    deleteDocument,
+    pending: rosterPending,
+  } = useFirestore("students", "teacherId");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
@@ -231,27 +221,20 @@ export default function Home() {
     );
   }, [date, year, dayNum]);
 
-  const addStudent = useCallback(() => {
+  const addStudent = useCallback(async () => {
     const f = firstName.trim();
     const l = lastName.trim();
     if (!f && !l) return;
-    const updated = [
-      ...roster,
-      { id: generateId(), firstName: f, lastName: l },
-    ];
-    setRoster(updated);
-    saveRoster(updated);
+    await addDocument({ firstName: f, lastName: l });
     setFirstName("");
     setLastName("");
-  }, [firstName, lastName, roster]);
+  }, [firstName, lastName, addDocument]);
 
   const removeStudent = useCallback(
-    (id: string) => {
-      const updated = roster.filter((s) => s.id !== id);
-      setRoster(updated);
-      saveRoster(updated);
+    async (id: string) => {
+      await deleteDocument(id);
     },
-    [roster],
+    [deleteDocument],
   );
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -494,13 +477,12 @@ export default function Home() {
                     color="muted.contrast"
                     mb={1.5}
                   >
-                    First Name
+                    Last Name
                   </Text>
                   <Input
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="e.g. Emma"
                     {...sharedInputProps}
                   />
                 </Box>
@@ -514,18 +496,19 @@ export default function Home() {
                     color="muted.contrast"
                     mb={1.5}
                   >
-                    Last Name
+                    First Name
                   </Text>
                   <Input
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="e.g. Johnson"
                     {...sharedInputProps}
                   />
                 </Box>
+
                 <Button
                   onClick={addStudent}
+                  loading={rosterPending}
                   rounded="xl"
                   bg="primary.solid"
                   color="primary.contrast"
@@ -546,7 +529,20 @@ export default function Home() {
 
             {/* Student list */}
             <Box mt={8}>
-              {roster.length === 0 ? (
+              {rosterLoading ? (
+                <Box
+                  rounded="2xl"
+                  borderWidth="1px"
+                  borderColor="border"
+                  bg="secondary.solid/30"
+                  py={16}
+                  textAlign="center"
+                  fontSize="sm"
+                  color="muted.contrast"
+                >
+                  Loading students…
+                </Box>
+              ) : roster.length === 0 ? (
                 <Box
                   rounded="2xl"
                   borderWidth="1px"
@@ -581,31 +577,16 @@ export default function Home() {
                       gap={3}
                       px={5}
                       py={3.5}
-                      bg="card.solid"
+                      bg="secondary.solid/40"
                       borderBottomWidth={index < roster.length - 1 ? "1px" : 0}
                       borderColor="border"
                       transition="background 0.15s"
                       _hover={{
-                        bg: "secondary.solid/40",
+                        bg: "secondary.solid/50",
                         "& .delete-btn": { opacity: 1 },
                       }}
                     >
                       <Flex align="center" gap={3} minW={0}>
-                        <Flex
-                          h={8}
-                          w={8}
-                          shrink={0}
-                          align="center"
-                          justify="center"
-                          rounded="full"
-                          bg="primary.solid/10"
-                          color="primary.fg"
-                          fontSize="xs"
-                          fontWeight="semibold"
-                        >
-                          {(student.firstName[0] ?? "?").toUpperCase()}
-                          {(student.lastName[0] ?? "").toUpperCase()}
-                        </Flex>
                         <Box minW={0}>
                           <Text
                             truncate
@@ -613,16 +594,13 @@ export default function Home() {
                             fontWeight="medium"
                             color="fg"
                           >
-                            {student.firstName} {student.lastName}
-                          </Text>
-                          <Text fontSize="11px" color="muted.contrast">
-                            Student #{index + 1}
+                            {index + 1}. {student.lastName} {student.firstName}
                           </Text>
                         </Box>
                       </Flex>
                       <Button
                         onClick={() => removeStudent(student.id)}
-                        aria-label={`Remove ${student.firstName} ${student.lastName}`}
+                        aria-label={`Remove ${student.lastName} ${student.firstName}`}
                         className="delete-btn"
                         variant="ghost"
                         h={8}
