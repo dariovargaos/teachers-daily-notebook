@@ -19,6 +19,14 @@ service cloud.firestore {
                    && request.resource.data.uid == request.auth.uid;
     }
 
+    // Planner notes: each document belongs to one teacher via the uid field
+    match /plannerNotes/{noteId} {
+      allow read, update, delete: if request.auth != null
+                                  && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null
+                   && request.resource.data.uid == request.auth.uid;
+    }
+
     // Keep existing open rules for other collections
     match /{document=**} {
       allow read, write;

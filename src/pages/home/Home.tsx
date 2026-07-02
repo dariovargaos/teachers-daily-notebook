@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback, useReducer, useEffect } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import {
   Box,
   Button,
@@ -55,15 +55,18 @@ const MONTHS = [
   "December",
 ];
 
-function dateKey(d: Date) {
-  return `planner:${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
-}
-
 function eventKey(d: Date) {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 }
 
 type Reminder = {
+  id: string;
+  date: string;
+  text: string;
+  uid: string;
+};
+
+type PlannerNote = {
   id: string;
   date: string;
   text: string;
@@ -97,19 +100,44 @@ export default function Home() {
     return d;
   });
 
-  // localStorage is the source of truth — forceUpdate triggers re-reads
-  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
-  const notes: string =
-    typeof window !== "undefined"
-      ? (window.localStorage.getItem(dateKey(date)) ?? "")
-      : "";
+  // ── Planner notes — read via useCollection, write via useFirestore ──
+  const { data: allNotes = [] } = useCollection<PlannerNote>("plannerNotes");
 
-  const handleNotesChange = (value: string) => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(dateKey(date), value);
-    }
-    forceUpdate(); // trigger re-render so notes reads the new value
-  };
+  const dateNotes = useMemo(
+    () => allNotes.filter((n) => n.date === eventKey(date)),
+    [allNotes, date],
+  );
+
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [editNoteText, setEditNoteText] = useState("");
+  const [newNoteText, setNewNoteText] = useState("");
+
+  const {
+    addDocument: addNoteDoc,
+    deleteDocument: deleteNoteDoc,
+    updateDocument: updateNoteDoc,
+  } = useFirestore("plannerNotes");
+
+  const addNote = useCallback(
+    async (text: string) => {
+      await addNoteDoc({ date: eventKey(date), text });
+    },
+    [date, addNoteDoc],
+  );
+
+  const updateNote = useCallback(
+    async (id: string, newText: string) => {
+      await updateNoteDoc(id, { text: newText });
+    },
+    [updateNoteDoc],
+  );
+
+  const deleteNote = useCallback(
+    async (id: string) => {
+      await deleteNoteDoc(id);
+    },
+    [deleteNoteDoc],
+  );
 
   // ── Reminders — read via useCollection, write via useFirestore ──
   const { data: allReminders = [] } = useCollection<Reminder>("reminders");
@@ -299,82 +327,214 @@ export default function Home() {
             </Flex>
 
             {/* Paper canvas */}
-            <Box position="relative">
+            <Box
+              rounded="2rem"
+              bg="paper/75"
+              borderWidth="1px"
+              borderColor="white/70"
+              backdropFilter="blur(12px)"
+              p={{ base: 6, sm: 8 }}
+              boxShadow="0 30px 70px -40px oklch(0.3 0.06 60 / 0.3)"
+              minH="55vh"
+            >
               <Box
-                rounded="2rem"
-                bg="paper/75"
-                borderWidth="1px"
-                borderColor="white/70"
-                backdropFilter="blur(12px)"
-                p={{ base: 6, sm: 8 }}
-                boxShadow="0 30px 70px -40px oklch(0.3 0.06 60 / 0.3)"
+                as="label"
+                display="block"
+                fontSize="10px"
+                fontWeight="bold"
+                textTransform="uppercase"
+                letterSpacing="0.18em"
+                color="gold"
+                mb={4}
               >
-                <Box
-                  as="label"
-                  display="block"
-                  fontSize="10px"
-                  fontWeight="bold"
-                  textTransform="uppercase"
-                  letterSpacing="0.18em"
-                  color="gold"
-                  mb={4}
-                >
-                  Teaching Focus
-                </Box>
-                <Textarea
-                  id="notes"
-                  value={notes}
-                  onChange={(e) => handleNotesChange(e.target.value)}
-                  placeholder="What are you teaching today? Lessons, reminders, ideas…"
-                  autoresize
-                  minH="48vh"
-                  w="full"
-                  resize="none"
-                  border={0}
-                  p={0}
-                  fontSize="lg"
-                  lineHeight="relaxed"
-                  color="fg/85"
-                  _placeholder={{ color: "fg/30" }}
-                  _focus={{ outline: "none" }}
-                />
+                Teaching Focus
               </Box>
 
-              {/* Floating auto-save bar */}
-              <Flex
-                position="absolute"
-                bottom="-20px"
-                left="50%"
-                transform="translateX(-50%)"
-                w={{ base: "88%", sm: "70%" }}
-                bg="primary.solid"
-                color="primary.contrast"
-                rounded="2xl"
-                px={4}
-                py={2.5}
-                align="center"
-                justify="space-between"
-                boxShadow="0 20px 40px -15px oklch(0.2 0.05 50 / 0.5)"
-                borderWidth="1px"
-                borderColor="white/5"
-              >
-                <Flex
-                  align="center"
-                  gap={2}
-                  fontSize="11px"
-                  fontWeight="semibold"
-                >
-                  <Box h={1.5} w={1.5} rounded="full" bg="gold" />
-                  Auto-saved
+              <Flex direction="column" gap={0}>
+                {dateNotes.length === 0 && (
+                  <Text fontSize="md" color="fg/30" py={3} fontStyle="italic">
+                    What are you teaching today? Add your first note below…
+                  </Text>
+                )}
+
+                {dateNotes.map((n, i) => (
+                  <Flex
+                    key={n.id}
+                    align="start"
+                    gap={3}
+                    py={2.5}
+                    px={2}
+                    mx={-2}
+                    borderBottomWidth="1px"
+                    borderColor="border/20"
+                    minW={0}
+                    overflow="hidden"
+                    rounded="lg"
+                    _hover={{ bg: "secondary.solid/20" }}
+                    role="group"
+                  >
+                    <Text
+                      as="span"
+                      flexShrink={0}
+                      color="primary.solid"
+                      fontSize="sm"
+                      lineHeight="1.8"
+                      minW="18px"
+                      textAlign="right"
+                    >
+                      {i + 1}.
+                    </Text>
+
+                    {editingNoteId === n.id ? (
+                      <>
+                        <Textarea
+                          flex={1}
+                          value={editNoteText}
+                          onChange={(e) => setEditNoteText(e.target.value)}
+                          autoFocus
+                          autoresize
+                          fontSize="md"
+                          lineHeight="relaxed"
+                          color="fg"
+                          p={0}
+                          resize="none"
+                          border={0}
+                          _focus={{ outline: "none", boxShadow: "none" }}
+                          onKeyDown={(e) => {
+                            if (
+                              e.key === "Enter" &&
+                              !e.shiftKey &&
+                              editNoteText.trim()
+                            ) {
+                              e.preventDefault();
+                              updateNote(n.id, editNoteText.trim());
+                              setEditingNoteId(null);
+                            }
+                            if (e.key === "Escape") setEditingNoteId(null);
+                          }}
+                        />
+                        <Flex direction="column" gap={1} flexShrink={0}>
+                          <IconButton
+                            variant="ghost"
+                            size="2xs"
+                            aria-label="Save"
+                            onClick={() => {
+                              if (editNoteText.trim())
+                                updateNote(n.id, editNoteText.trim());
+                              setEditingNoteId(null);
+                            }}
+                          >
+                            <LuCheck />
+                          </IconButton>
+                          <IconButton
+                            variant="ghost"
+                            size="2xs"
+                            aria-label="Cancel"
+                            onClick={() => setEditingNoteId(null)}
+                          >
+                            <LuX />
+                          </IconButton>
+                        </Flex>
+                      </>
+                    ) : (
+                      <>
+                        <Text
+                          flex={1}
+                          minW={0}
+                          fontSize="md"
+                          lineHeight="relaxed"
+                          color="fg/85"
+                          wordBreak="break-word"
+                        >
+                          {n.text}
+                        </Text>
+                        <Flex
+                          direction="column"
+                          gap={1}
+                          flexShrink={0}
+                          _groupHover={{ opacity: 1 }}
+                          transition="opacity 0.15s"
+                        >
+                          <IconButton
+                            variant="ghost"
+                            size="2xs"
+                            aria-label="Edit"
+                            onClick={() => {
+                              setEditingNoteId(n.id);
+                              setEditNoteText(n.text);
+                            }}
+                          >
+                            <LuPencilLine />
+                          </IconButton>
+                          <IconButton
+                            variant="ghost"
+                            size="2xs"
+                            aria-label="Delete"
+                            onClick={() => deleteNote(n.id)}
+                          >
+                            <LuTrash2 />
+                          </IconButton>
+                        </Flex>
+                      </>
+                    )}
+                  </Flex>
+                ))}
+
+                {/* Add new note row */}
+                <Flex align="start" gap={3} py={2.5} px={2} mx={-2} minW={0}>
+                  <Text
+                    as="span"
+                    flexShrink={0}
+                    color="muted.contrast/40"
+                    fontSize="sm"
+                    lineHeight="1.8"
+                    minW="18px"
+                    textAlign="right"
+                  >
+                    {dateNotes.length + 1}.
+                  </Text>
+                  <Textarea
+                    flex={1}
+                    placeholder="Add a note…"
+                    value={newNoteText}
+                    onChange={(e) => setNewNoteText(e.target.value)}
+                    autoresize
+                    fontSize="md"
+                    lineHeight="relaxed"
+                    color="fg"
+                    p={0}
+                    resize="none"
+                    border={0}
+                    _placeholder={{ color: "fg/30", fontStyle: "italic" }}
+                    _focus={{ outline: "none", boxShadow: "none" }}
+                    onKeyDown={(e) => {
+                      if (
+                        e.key === "Enter" &&
+                        !e.shiftKey &&
+                        newNoteText.trim()
+                      ) {
+                        e.preventDefault();
+                        addNote(newNoteText.trim());
+                        setNewNoteText("");
+                      }
+                    }}
+                  />
+                  <IconButton
+                    variant="ghost"
+                    size="2xs"
+                    aria-label="Add note"
+                    flexShrink={0}
+                    mt={1}
+                    onClick={() => {
+                      if (newNoteText.trim()) {
+                        addNote(newNoteText.trim());
+                        setNewNoteText("");
+                      }
+                    }}
+                  >
+                    <LuPlus />
+                  </IconButton>
                 </Flex>
-                <Text fontSize="11px" opacity={0.6} fontWeight="medium">
-                  Day{" "}
-                  {Math.ceil(
-                    (date.getTime() - new Date(year, 0, 1).getTime()) /
-                      86400000,
-                  ) + 1}{" "}
-                  · {year}
-                </Text>
               </Flex>
             </Box>
           </Box>
