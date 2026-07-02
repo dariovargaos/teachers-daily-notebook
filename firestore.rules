@@ -11,6 +11,14 @@ service cloud.firestore {
                    && request.resource.data.teacherId == request.auth.uid;
     }
 
+    // Reminders: each document belongs to one teacher via the uid field
+    match /reminders/{reminderId} {
+      allow read, update, delete: if request.auth != null
+                                  && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null
+                   && request.resource.data.uid == request.auth.uid;
+    }
+
     // Keep existing open rules for other collections
     match /{document=**} {
       allow read, write;

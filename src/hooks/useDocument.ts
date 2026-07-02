@@ -1,33 +1,29 @@
-import { useState, useEffect } from "react";
-import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "@/firebase/config";
+import { useQuery } from "@tanstack/react-query";
+import { db } from "../firebase/config";
+import { getDoc, doc } from "firebase/firestore";
 
-export function useDocument<T extends { id: string }>(
-  collectionName: string,
-  documentId: string | null,
-) {
-  const [docData, setDocData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!documentId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset when documentId becomes null
-      setDocData(null);
-      return;
-    }
-    setLoading(true);
-
-    const unsub = onSnapshot(doc(db, collectionName, documentId), (snap) => {
-      if (snap.exists()) {
-        setDocData({ id: snap.id, ...snap.data() } as T);
-      } else {
-        setDocData(null);
-      }
-      setLoading(false);
-    });
-
-    return unsub;
-  }, [collectionName, documentId]);
-
-  return { doc: docData, loading };
+interface DocumentError {
+  message: string;
 }
+
+const fetchDocument = async <T>(
+  collectionName: string,
+  id: string,
+): Promise<T | null> => {
+  const docRef = doc(db, collectionName, id);
+  const snapshot = await getDoc(docRef);
+
+  if (snapshot.exists()) {
+    return { id: snapshot.id, ...snapshot.data() } as T;
+  } else {
+    throw new Error("Cannot load document.");
+  }
+};
+
+export const useDocument = <T>(collectionName: string, id: string) => {
+  return useQuery<T | null, DocumentError>({
+    queryKey: ["document", collectionName, id],
+    queryFn: () => fetchDocument(collectionName, id),
+    enabled: !!id,
+  });
+};

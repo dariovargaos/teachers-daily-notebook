@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
-import { Link as RouterLink, useNavigate } from "react-router";
+import { useState } from "react";
+import { Link as RouterLink } from "react-router";
 import { useSignup } from "../../hooks/useSignup";
-import { useAuthContext } from "../../hooks/useAuthContext";
 import {
   Box,
   Flex,
@@ -35,15 +34,6 @@ export default function Signup() {
   const [password, setPassword] = useState("");
 
   const { signup, error, isPending } = useSignup();
-  const { user } = useAuthContext();
-  const navigate = useNavigate();
-
-  // Redirect to home once authenticated
-  useEffect(() => {
-    if (user) {
-      navigate("/", { replace: true });
-    }
-  }, [user, navigate]);
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();

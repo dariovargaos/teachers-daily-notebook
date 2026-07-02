@@ -1,51 +1,33 @@
-import { useState, useEffect } from "react";
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-  type QueryConstraint,
-} from "firebase/firestore";
-import { db } from "@/firebase/config";
+import { useQuery } from "@tanstack/react-query";
 import { useAuthContext } from "./useAuthContext";
+import { db } from "../firebase/config";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 
-export function useCollection<T extends { id: string }>(
+export const useCollection = <T = Record<string, unknown>>(
   collectionName: string,
-  uidField: string = "uid",
-  orderByField: string | readonly string[] = "createdAt",
-) {
+) => {
   const { user } = useAuthContext();
-  const [docs, setDocs] = useState<T[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user?.uid) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- show loading on dependency change
-    setLoading(true);
-
-    const constraints: QueryConstraint[] = [where(uidField, "==", user.uid)];
-    const fields = Array.isArray(orderByField) ? orderByField : [orderByField];
-    for (const field of fields) {
-      constraints.push(orderBy(field, "asc"));
+  const fetchCollectionData = async (): Promise<(T & { id: string })[]> => {
+    if (!user?.uid) {
+      throw new Error("User not authenticated.");
     }
-
-    const q = query(collection(db, collectionName), ...constraints);
-
-    const unsub = onSnapshot(
-      q,
-      (snap) => {
-        setDocs(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as T));
-        setLoading(false);
-      },
-      (error) => {
-        console.error(`useCollection("${collectionName}"):`, error);
-        setLoading(false);
-      },
+    const q = query(
+      collection(db, collectionName),
+      where("uid", "==", user.uid),
+      orderBy("createdAt"),
     );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(
+      (doc) => ({ id: doc.id, ...doc.data() }) as T & { id: string },
+    );
+  };
 
-    return unsub;
-  }, [collectionName, uidField, orderByField, user?.uid]);
-
-  return { docs, loading };
-}
+  return useQuery<(T & { id: string })[]>({
+    queryKey: [collectionName, user?.uid],
+    queryFn: fetchCollectionData,
+    enabled: !!user?.uid,
+    refetchOnWindowFocus: false,
+    staleTime: 10000,
+  });
+};

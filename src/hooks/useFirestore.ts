@@ -1,58 +1,130 @@
-import { useCallback, useState } from "react";
+import {
+  useMutation,
+  type UseMutationResult,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { useAuthContext } from "./useAuthContext";
+import { db, Timestamp } from "../firebase/config";
 import {
   collection,
+  doc,
   addDoc,
   deleteDoc,
+  DocumentReference,
+  CollectionReference,
   updateDoc,
-  doc,
 } from "firebase/firestore";
-import { db, Timestamp } from "@/firebase/config";
-import { useAuthContext } from "./useAuthContext";
 
-export function useFirestore(collectionName: string, uidField: string = "uid") {
-  const { user } = useAuthContext();
-  const [pending, setPending] = useState(false);
-
-  const addDocument = useCallback(
-    async (data: Record<string, unknown>) => {
-      if (!user?.uid) return;
-      setPending(true);
-      try {
-        await addDoc(collection(db, collectionName), {
-          ...data,
-          [uidField]: user.uid,
-          createdAt: Timestamp.now(),
-        });
-      } finally {
-        setPending(false);
-      }
-    },
-    [collectionName, uidField, user?.uid],
-  );
-
-  const deleteDocument = useCallback(
-    async (id: string) => {
-      setPending(true);
-      try {
-        await deleteDoc(doc(db, collectionName, id));
-      } finally {
-        setPending(false);
-      }
-    },
-    [collectionName],
-  );
-
-  const updateDocument = useCallback(
-    async (id: string, updates: Record<string, unknown>) => {
-      setPending(true);
-      try {
-        await updateDoc(doc(db, collectionName, id), updates);
-      } finally {
-        setPending(false);
-      }
-    },
-    [collectionName],
-  );
-
-  return { addDocument, deleteDocument, updateDocument, pending };
+interface DocumentData {
+  [key: string]: unknown;
 }
+
+interface AddDocumentParams {
+  doc: DocumentData;
+}
+
+interface DeleteDocumentParams {
+  id: string;
+}
+
+interface UpdateDocumentParams {
+  id: string;
+  updates: DocumentData;
+}
+
+export const useFirestore = (collectionName: string) => {
+  const queryClient = useQueryClient();
+  const { user } = useAuthContext();
+
+  //collection ref
+  const collectionRef: CollectionReference<DocumentData> = collection(
+    db,
+    collectionName,
+  );
+
+  // add a document mutation
+  const addDocumentMutation: UseMutationResult<
+    DocumentReference<DocumentData>,
+    Error,
+    AddDocumentParams
+  > = useMutation({
+    mutationFn: async ({ doc }): Promise<DocumentReference<DocumentData>> => {
+      const createdAt = Timestamp.fromDate(new Date());
+      const addedDocumentRef = await addDoc(collectionRef, {
+        ...doc,
+        createdAt: createdAt,
+        uid: user?.uid,
+      });
+      return addedDocumentRef;
+    },
+    onSuccess: () => {
+      console.log("Document added successfully.");
+      queryClient.invalidateQueries({ queryKey: [collectionName] });
+    },
+    onError: (error) => {
+      console.log("Error: ", error);
+    },
+  });
+
+  // delete a document mutation
+  const deleteDocumentMutation: UseMutationResult<
+    void,
+    Error,
+    DeleteDocumentParams
+  > = useMutation({
+    mutationFn: async ({ id }): Promise<void> => {
+      await deleteDoc(doc(collectionRef, id));
+    },
+    onSuccess: () => {
+      console.log("Document deleted successfully.");
+      queryClient.invalidateQueries({ queryKey: [collectionName] });
+    },
+    onError: (error) => {
+      console.log("Error: ", error);
+    },
+  });
+
+  //update document mutation
+  const updateDocumentMutation: UseMutationResult<
+    void,
+    Error,
+    UpdateDocumentParams
+  > = useMutation({
+    mutationFn: async ({ id, updates }): Promise<void> => {
+      const documentRef = doc(collectionRef, id);
+      await updateDoc(documentRef, updates);
+    },
+    onSuccess: (_, { id }) => {
+      console.log("Document updated successfully.");
+      queryClient.invalidateQueries({
+        queryKey: [collectionName],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["document", collectionName, id],
+      });
+    },
+    onError: (error) => {
+      console.log("Error: ", error);
+    },
+  });
+
+  //add document
+  const addDocument = async (doc: DocumentData): Promise<void> => {
+    await addDocumentMutation.mutateAsync({ doc });
+  };
+
+  //delete document
+  const deleteDocument = async (id: string): Promise<void> => {
+    await deleteDocumentMutation.mutateAsync({ id });
+  };
+
+  //update document
+  const updateDocument = async (
+    id: string,
+    updates: DocumentData,
+  ): Promise<void> => {
+    await updateDocumentMutation.mutateAsync({ id, updates });
+  };
+
+  return { addDocument, deleteDocument, updateDocument };
+};

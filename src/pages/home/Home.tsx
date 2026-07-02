@@ -4,26 +4,28 @@ import {
   Button,
   Flex,
   Grid,
+  IconButton,
   Input,
   Text,
   Textarea,
   Container,
 } from "@chakra-ui/react";
 import {
+  LuCheck,
   LuChevronLeft,
   LuChevronRight,
-  LuNotebookPen,
-  LuTrash2,
+  LuPencilLine,
   LuPlus,
-  LuLogOut,
+  LuTrash2,
+  LuX,
 } from "react-icons/lu";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { useAuthContext } from "@/hooks/useAuthContext";
-import { useLogout } from "@/hooks/useLogout";
 import { useCollection } from "@/hooks/useCollection";
 import { useFirestore } from "@/hooks/useFirestore";
 import Calendar from "@/components/calendar/Calendar";
+import AppHeader from "@/components/layout/AppHeader";
 
 // ═══════════════════════════════════════════════════════════════
 // Helpers
@@ -57,93 +59,22 @@ function dateKey(d: Date) {
   return `planner:${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 }
 
-const EVENTS_KEY = "planner:events";
-
 function eventKey(d: Date) {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 }
 
-function loadEvents(): Record<string, string> {
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = window.localStorage.getItem(EVENTS_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === "object" ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
-function saveEvents(events: Record<string, string>) {
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
-  }
-}
-
-type Student = {
+type Reminder = {
   id: string;
-  firstName: string;
-  lastName: string;
-  teacherId: string;
+  date: string;
+  text: string;
+  uid: string;
 };
-
-// ═══════════════════════════════════════════════════════════════
-// Shell — glassmorphism card wrapper
-// ═══════════════════════════════════════════════════════════════
-
-function Shell({
-  children,
-  padded = true,
-}: {
-  children: React.ReactNode;
-  padded?: boolean;
-}) {
-  return (
-    <Box
-      position="relative"
-      rounded="2rem"
-      bg="card.solid/70"
-      borderWidth="1px"
-      borderColor="fg/8"
-      backdropFilter="blur(12px)"
-      boxShadow="0 30px 70px -40px oklch(0.3 0.06 60 / 0.35)"
-      overflow="visible"
-      px={padded ? { base: 6, sm: 10 } : undefined}
-      py={padded ? { base: 8, sm: 10 } : undefined}
-    >
-      {children}
-    </Box>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════
-// Shared input style
-// ═══════════════════════════════════════════════════════════════
-
-const sharedInputProps = {
-  size: "sm" as const,
-  rounded: "xl",
-  borderColor: "border",
-  bg: "secondary.solid/50",
-  color: "fg",
-  fontSize: "sm",
-  _placeholder: { color: "muted.contrast/60" },
-  _focusVisible: {
-    outline: "none",
-    borderColor: "primary.solid/40",
-    boxShadow: "0 0 0 2px {colors.primary.solid/30}",
-  },
-};
-
-const STUDENT_ORDER = ["lastName", "firstName"] as const;
 
 // ═══════════════════════════════════════════════════════════════
 // PlannerPage — main component
 // ═══════════════════════════════════════════════════════════════
 
 export default function Home() {
-  const { logout, isPending } = useLogout();
   const { user } = useAuthContext();
   const [teacherFirstName, setTeacherFirstName] = useState("");
 
@@ -160,7 +91,6 @@ export default function Home() {
     fetchName();
   }, [user]);
 
-  const [page, setPage] = useState<"roster" | "planner">("planner");
   const [date, setDate] = useState<Date>(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
@@ -181,25 +111,55 @@ export default function Home() {
     forceUpdate(); // trigger re-render so notes reads the new value
   };
 
-  const { docs: roster, loading: rosterLoading } = useCollection<Student>(
-    "students",
-    "teacherId",
-    STUDENT_ORDER,
+  // ── Reminders — read via useCollection, write via useFirestore ──
+  const { data: allReminders = [] } = useCollection<Reminder>("reminders");
+
+  const dateReminders = useMemo(
+    () => allReminders.filter((r) => r.date === eventKey(date)),
+    [allReminders, date],
   );
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
+  const [newReminderText, setNewReminderText] = useState("");
+
+  // Derived: Date objects for calendar dots (dates with ≥1 reminder)
+  const eventDates = useMemo(
+    () =>
+      [...new Set(allReminders.map((r) => r.date))].map((k) => {
+        const [y, m, d] = k.split("-").map(Number);
+        return new Date(y, m - 1, d);
+      }),
+    [allReminders],
+  );
+
   const {
-    addDocument,
-    deleteDocument,
-    pending: rosterPending,
-  } = useFirestore("students", "teacherId");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+    addDocument: addReminderDoc,
+    deleteDocument: deleteReminderDoc,
+    updateDocument: updateReminderDoc,
+  } = useFirestore("reminders");
 
-  const [events, setEvents] = useState<Record<string, string>>(() =>
-    loadEvents(),
+  // ── CRUD on the current date's reminders ──
+  const addReminder = useCallback(
+    async (text: string) => {
+      await addReminderDoc({ date: eventKey(date), text });
+    },
+    [date, addReminderDoc],
   );
 
-  // Derived from events — no separate state or effect needed
-  const eventDraft = events[eventKey(date)] ?? "";
+  const updateReminder = useCallback(
+    async (id: string, newText: string) => {
+      await updateReminderDoc(id, { text: newText });
+    },
+    [updateReminderDoc],
+  );
+
+  const deleteReminder = useCallback(
+    async (id: string) => {
+      await deleteReminderDoc(id);
+    },
+    [deleteReminderDoc],
+  );
 
   const shiftDay = (delta: number) => {
     const next = new Date(date);
@@ -221,418 +181,8 @@ export default function Home() {
     );
   }, [date, year, dayNum]);
 
-  const addStudent = useCallback(async () => {
-    const f = firstName.trim();
-    const l = lastName.trim();
-    if (!f && !l) return;
-    await addDocument({ firstName: f, lastName: l });
-    setFirstName("");
-    setLastName("");
-  }, [firstName, lastName, addDocument]);
-
-  const removeStudent = useCallback(
-    async (id: string) => {
-      await deleteDocument(id);
-    },
-    [deleteDocument],
-  );
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      addStudent();
-    }
-  };
-
-  const handleEventChange = (value: string) => {
-    const key = eventKey(date);
-    const next = { ...events };
-    if (value.trim()) {
-      next[key] = value;
-    } else {
-      delete next[key];
-    }
-    setEvents(next);
-    saveEvents(next);
-  };
-
-  const clearEvent = () => {
-    handleEventChange("");
-  };
-
-  const eventDates = useMemo(
-    () =>
-      Object.keys(events).map((k) => {
-        const [y, m, d] = k.split("-").map(Number);
-        return new Date(y, m - 1, d);
-      }),
-    [events],
-  );
-
   // ═══════════════════════════════════════════════════════════
-  // Shared header (logo + nav)
-  // ═══════════════════════════════════════════════════════════
-  const Header = (
-    <Flex
-      as="header"
-      mb={{ base: 8, sm: 10 }}
-      align="center"
-      justify="space-between"
-    >
-      {/* Logo + title */}
-      <Flex align="center" gap={3}>
-        <Flex
-          h={10}
-          w={10}
-          align="center"
-          justify="center"
-          rounded="xl"
-          bg="primary.solid"
-          color="primary.contrast"
-          boxShadow="0 8px 24px -12px oklch(0.2 0.03 50 / 0.6)"
-        >
-          <LuNotebookPen size="1.125rem" />
-        </Flex>
-        <Box lineHeight="tight">
-          {teacherFirstName && (
-            <Text
-              fontSize="xs"
-              fontWeight="medium"
-              color="muted.contrast"
-              mb={0.5}
-            >
-              Good day, {teacherFirstName}
-            </Text>
-          )}
-          <Text
-            textStyle="display"
-            fontSize="sm"
-            fontWeight="semibold"
-            textTransform="uppercase"
-            letterSpacing="0.18em"
-            color="fg"
-          >
-            Atelier
-          </Text>
-          <Text
-            fontSize="10px"
-            fontWeight="medium"
-            letterSpacing="0.18em"
-            color="muted.contrast"
-          >
-            EST. {year}
-          </Text>
-        </Box>
-      </Flex>
-
-      {/* Nav tabs */}
-      <Flex
-        as="nav"
-        align="center"
-        gap={1}
-        rounded="full"
-        bg="secondary.solid/85"
-        p={1}
-      >
-        <Button
-          onClick={() => setPage("planner")}
-          variant="plain"
-          rounded="full"
-          px={4}
-          py={1.5}
-          fontSize="xs"
-          fontWeight="semibold"
-          bg={page === "planner" ? "card.solid" : "transparent"}
-          color={page === "planner" ? "fg" : "muted.contrast/70"}
-          boxShadow={page === "planner" ? "sm" : undefined}
-          _hover={{ color: "fg" }}
-          transition="all 0.15s"
-        >
-          Planner
-        </Button>
-        <Button
-          onClick={() => setPage("roster")}
-          variant="plain"
-          rounded="full"
-          px={4}
-          py={1.5}
-          fontSize="xs"
-          fontWeight="semibold"
-          bg={page === "roster" ? "card.solid" : "transparent"}
-          color={page === "roster" ? "fg" : "muted.contrast/70"}
-          boxShadow={page === "roster" ? "sm" : undefined}
-          _hover={{ color: "fg" }}
-          transition="all 0.15s"
-        >
-          Roster
-        </Button>
-
-        {/* Logout */}
-        <Button
-          onClick={logout}
-          loading={isPending}
-          aria-label="Sign out"
-          variant="ghost"
-          minW={0}
-          rounded="full"
-          borderWidth="1px"
-          borderColor="border/70"
-          bg="card.solid/60"
-          color="muted.contrast"
-          _hover={{
-            color: "fg",
-            borderColor: "fg/30",
-          }}
-          _active={{ transform: "scale(0.95)" }}
-          transition="all 0.15s"
-        >
-          Log out
-          <LuLogOut />
-        </Button>
-      </Flex>
-    </Flex>
-  );
-
-  // ═══════════════════════════════════════════════════════════
-  // Shared footer
-  // ═══════════════════════════════════════════════════════════
-  const Footer = (
-    <Flex
-      as="footer"
-      mt={10}
-      justify="center"
-      fontSize="10px"
-      textTransform="uppercase"
-      letterSpacing="0.2em"
-      color="muted.contrast/70"
-    >
-      <Text>Atelier · A quiet planner for modern teachers</Text>
-    </Flex>
-  );
-
-  // ═══════════════════════════════════════════════════════════
-  // Roster page
-  // ═══════════════════════════════════════════════════════════
-  if (page === "roster") {
-    return (
-      <Box
-        as="main"
-        minH="100dvh"
-        py={{ base: 6, sm: 10 }}
-        px={{ base: 4, sm: 8 }}
-      >
-        <Container maxW="5xl" p={0}>
-          {Header}
-
-          <Shell>
-            {/* Title row */}
-            <Flex
-              align="end"
-              justify="space-between"
-              gap={4}
-              pb={6}
-              borderBottomWidth="1px"
-              borderColor="border"
-            >
-              <Box>
-                <Text
-                  fontSize="xs"
-                  textTransform="uppercase"
-                  letterSpacing="0.2em"
-                  color="muted.contrast"
-                >
-                  Class Roster
-                </Text>
-                <Text
-                  textStyle="display"
-                  mt={2}
-                  fontSize={{ base: "4xl", sm: "5xl" }}
-                  fontWeight="semibold"
-                  letterSpacing="tight"
-                  color="fg"
-                >
-                  My students
-                </Text>
-                <Text mt={2} fontSize="sm" color="muted.contrast">
-                  {roster.length} {roster.length === 1 ? "student" : "students"}{" "}
-                  enrolled
-                </Text>
-              </Box>
-            </Flex>
-
-            {/* Add student row */}
-            <Box mt={6}>
-              <Flex
-                direction={{ base: "column", sm: "row" }}
-                align={{ base: "stretch", sm: "end" }}
-                gap={3}
-              >
-                <Box flex={1}>
-                  <Text
-                    as="label"
-                    display="block"
-                    fontSize="10px"
-                    textTransform="uppercase"
-                    letterSpacing="wider"
-                    color="muted.contrast"
-                    mb={1.5}
-                  >
-                    Last Name
-                  </Text>
-                  <Input
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    {...sharedInputProps}
-                  />
-                </Box>
-                <Box flex={1}>
-                  <Text
-                    as="label"
-                    display="block"
-                    fontSize="10px"
-                    textTransform="uppercase"
-                    letterSpacing="wider"
-                    color="muted.contrast"
-                    mb={1.5}
-                  >
-                    First Name
-                  </Text>
-                  <Input
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    {...sharedInputProps}
-                  />
-                </Box>
-
-                <Button
-                  onClick={addStudent}
-                  loading={rosterPending}
-                  rounded="xl"
-                  bg="primary.solid"
-                  color="primary.contrast"
-                  px={5}
-                  py={2.5}
-                  fontSize="sm"
-                  fontWeight="medium"
-                  boxShadow="sm"
-                  _hover={{ opacity: 0.9 }}
-                  _active={{ transform: "scale(0.98)" }}
-                  transition="all 0.15s"
-                >
-                  <LuPlus style={{ marginRight: "0.375rem" }} />
-                  Add
-                </Button>
-              </Flex>
-            </Box>
-
-            {/* Student list */}
-            <Box mt={8}>
-              {rosterLoading ? (
-                <Box
-                  rounded="2xl"
-                  borderWidth="1px"
-                  borderColor="border"
-                  bg="secondary.solid/30"
-                  py={16}
-                  textAlign="center"
-                  fontSize="sm"
-                  color="muted.contrast"
-                >
-                  Loading students…
-                </Box>
-              ) : roster.length === 0 ? (
-                <Box
-                  rounded="2xl"
-                  borderWidth="1px"
-                  borderStyle="dashed"
-                  borderColor="border"
-                  bg="secondary.solid/30"
-                  py={16}
-                  textAlign="center"
-                  fontSize="sm"
-                  color="muted.contrast"
-                >
-                  No students yet. Add your first student above.
-                </Box>
-              ) : (
-                <Box
-                  as="ul"
-                  listStyleType="none"
-                  m={0}
-                  p={0}
-                  rounded="2xl"
-                  borderWidth="1px"
-                  borderColor="border"
-                  overflow="hidden"
-                >
-                  {roster.map((student, index) => (
-                    <Box
-                      key={student.id}
-                      as="li"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="space-between"
-                      gap={3}
-                      px={5}
-                      py={3.5}
-                      bg="secondary.solid/40"
-                      borderBottomWidth={index < roster.length - 1 ? "1px" : 0}
-                      borderColor="border"
-                      transition="background 0.15s"
-                      _hover={{
-                        bg: "secondary.solid/50",
-                        "& .delete-btn": { opacity: 1 },
-                      }}
-                    >
-                      <Flex align="center" gap={3} minW={0}>
-                        <Box minW={0}>
-                          <Text
-                            truncate
-                            fontSize="sm"
-                            fontWeight="medium"
-                            color="fg"
-                          >
-                            {index + 1}. {student.lastName} {student.firstName}
-                          </Text>
-                        </Box>
-                      </Flex>
-                      <Button
-                        onClick={() => removeStudent(student.id)}
-                        aria-label={`Remove ${student.lastName} ${student.firstName}`}
-                        className="delete-btn"
-                        variant="ghost"
-                        h={8}
-                        w={8}
-                        minW={0}
-                        p={0}
-                        rounded="lg"
-                        opacity={0}
-                        color="muted.contrast"
-                        transition="opacity 0.15s"
-                        _hover={{
-                          bg: "destructive.solid/10",
-                          color: "destructive.fg",
-                        }}
-                      >
-                        <LuTrash2 />
-                      </Button>
-                    </Box>
-                  ))}
-                </Box>
-              )}
-            </Box>
-          </Shell>
-
-          {Footer}
-        </Container>
-      </Box>
-    );
-  }
-
-  // ═══════════════════════════════════════════════════════════
-  // Planner page (default)
+  // Planner page
   // ═══════════════════════════════════════════════════════════
   return (
     <Box
@@ -642,7 +192,7 @@ export default function Home() {
       px={{ base: 4, sm: 8 }}
     >
       <Container maxW="5xl" p={0}>
-        {Header}
+        <AppHeader teacherFirstName={teacherFirstName} year={year} />
 
         {/* Two-column layout */}
         <Grid
@@ -901,56 +451,192 @@ export default function Home() {
                 />
               </Flex>
 
-              <Textarea
-                value={eventDraft}
-                onChange={(e) => handleEventChange(e.target.value)}
-                placeholder="e.g. Class 7B — Math exam, Chapter 4"
-                autoresize
-                variant="outline"
-                rounded="xl"
-                borderColor="border/70"
-                bg="card.solid/60"
-                p={3}
-                fontSize="sm"
-                lineHeight="6"
-                color="fg"
-                minH="130px"
-                w="full"
-                resize="none"
-                _placeholder={{ color: "muted.contrast/60" }}
-                _focusVisible={{
-                  outline: "none",
-                  borderColor: "primary.solid/40",
-                  boxShadow: "0 0 0 2px {colors.primary.solid/20}",
-                }}
-              />
-
-              <Flex mt={2} align="center" justify="space-between">
-                <Text fontSize="10px" color="muted.contrast">
-                  Days with notes show a red dot.
-                </Text>
-                {eventDraft.trim() && (
-                  <Button
-                    onClick={clearEvent}
-                    variant="plain"
-                    fontSize="10px"
-                    fontWeight="semibold"
-                    textTransform="uppercase"
-                    letterSpacing="wider"
-                    color="destructive.fg"
-                    h="auto"
-                    p={0}
-                    _hover={{ textDecoration: "underline" }}
-                  >
-                    Clear
-                  </Button>
+              {/* ── Reminder list ── */}
+              <Flex direction="column" gap={1}>
+                {dateReminders.length === 0 && (
+                  <Text fontSize="xs" color="muted.contrast/60" py={2}>
+                    No reminders for this day.
+                  </Text>
                 )}
+
+                {dateReminders.map((r) => (
+                  <Flex
+                    key={r.id}
+                    align="center"
+                    gap={2}
+                    py={1.5}
+                    px={1}
+                    rounded="lg"
+                    minW={0}
+                    overflow="hidden"
+                    _hover={{ bg: "secondary.solid/30" }}
+                    role="group"
+                  >
+                    <Text
+                      as="span"
+                      flexShrink={0}
+                      color="primary.solid"
+                      fontSize="sm"
+                      lineHeight="1.5"
+                    >
+                      •
+                    </Text>
+
+                    {editingId === r.id ? (
+                      <>
+                        <Input
+                          flex={1}
+                          value={editText}
+                          onChange={(e) => setEditText(e.target.value)}
+                          size="sm"
+                          autoFocus
+                          fontSize="sm"
+                          color="fg"
+                          variant="flushed"
+                          _focus={{
+                            boxShadow: "none",
+                            borderColor: "primary.solid/40",
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && editText.trim()) {
+                              updateReminder(r.id, editText.trim());
+                              setEditingId(null);
+                            }
+                            if (e.key === "Escape") setEditingId(null);
+                          }}
+                        />
+                        <IconButton
+                          variant="ghost"
+                          size="2xs"
+                          aria-label="Save"
+                          onClick={() => {
+                            if (editText.trim())
+                              updateReminder(r.id, editText.trim());
+                            setEditingId(null);
+                          }}
+                        >
+                          <LuCheck />
+                        </IconButton>
+                        <IconButton
+                          variant="ghost"
+                          size="2xs"
+                          aria-label="Cancel"
+                          onClick={() => setEditingId(null)}
+                        >
+                          <LuX />
+                        </IconButton>
+                      </>
+                    ) : (
+                      <>
+                        <Text
+                          flex={1}
+                          minW={0}
+                          fontSize="sm"
+                          color="fg"
+                          lineClamp={3}
+                          wordBreak="break-word"
+                        >
+                          {r.text}
+                        </Text>
+                        <IconButton
+                          variant="ghost"
+                          size="2xs"
+                          aria-label="Edit"
+                          _groupHover={{ opacity: 1 }}
+                          transition="opacity 0.15s"
+                          onClick={() => {
+                            setEditingId(r.id);
+                            setEditText(r.text);
+                          }}
+                        >
+                          <LuPencilLine />
+                        </IconButton>
+                        <IconButton
+                          variant="ghost"
+                          size="2xs"
+                          aria-label="Delete"
+                          _groupHover={{ opacity: 1 }}
+                          transition="opacity 0.15s"
+                          onClick={() => deleteReminder(r.id)}
+                        >
+                          <LuTrash2 />
+                        </IconButton>
+                      </>
+                    )}
+                  </Flex>
+                ))}
+
+                {/* ── Add new reminder ── */}
+                <Flex align="center" gap={2} py={1.5} px={1} minW={0}>
+                  <Text
+                    as="span"
+                    flexShrink={0}
+                    color="muted.contrast/40"
+                    fontSize="sm"
+                    lineHeight="1.5"
+                  >
+                    •
+                  </Text>
+                  <Input
+                    flex={1}
+                    placeholder="Add a reminder…"
+                    value={newReminderText}
+                    onChange={(e) => setNewReminderText(e.target.value)}
+                    size="sm"
+                    fontSize="sm"
+                    color="fg"
+                    variant="flushed"
+                    _placeholder={{
+                      color: "muted.contrast/50",
+                      fontStyle: "italic",
+                    }}
+                    _focus={{
+                      boxShadow: "none",
+                      borderColor: "primary.solid/40",
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && newReminderText.trim()) {
+                        addReminder(newReminderText.trim());
+                        setNewReminderText("");
+                      }
+                    }}
+                  />
+                  <IconButton
+                    variant="ghost"
+                    size="2xs"
+                    aria-label="Add reminder"
+                    onClick={() => {
+                      if (newReminderText.trim()) {
+                        addReminder(newReminderText.trim());
+                        setNewReminderText("");
+                      }
+                    }}
+                  >
+                    <LuPlus />
+                  </IconButton>
+                </Flex>
+              </Flex>
+
+              <Flex mt={3} align="center" justify="space-between">
+                <Text fontSize="10px" color="muted.contrast">
+                  Hover a reminder to edit or delete it.
+                </Text>
               </Flex>
             </Box>
           </Box>
         </Grid>
 
-        {Footer}
+        <Flex
+          as="footer"
+          mt={10}
+          justify="center"
+          fontSize="10px"
+          textTransform="uppercase"
+          letterSpacing="0.2em"
+          color="muted.contrast/70"
+        >
+          <Text>Atelier · A quiet planner for modern teachers</Text>
+        </Flex>
       </Container>
     </Box>
   );
