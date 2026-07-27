@@ -1,17 +1,23 @@
-rules_version='2'
+rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Students: only the creating teacher can read/write their own
-    match /students/{studentId} {
+    // Users: each teacher can only read/write their own profile document
+    match /users/{userId} {
       allow read, write: if request.auth != null
-                        && resource.data.teacherId == request.auth.uid;
-      allow create: if request.auth != null
-                   && request.resource.data.teacherId == request.auth.uid;
+                        && request.auth.uid == userId;
     }
 
-    // Reminders: each document belongs to one teacher via the uid field
+    // Students roster: only the teacher who owns the record can access it
+    match /students/{studentId} {
+      allow read, update, delete: if request.auth != null
+                                  && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null
+                   && request.resource.data.uid == request.auth.uid;
+    }
+
+    // Reminders: only the teacher who owns the record can access it
     match /reminders/{reminderId} {
       allow read, update, delete: if request.auth != null
                                   && resource.data.uid == request.auth.uid;
@@ -19,17 +25,12 @@ service cloud.firestore {
                    && request.resource.data.uid == request.auth.uid;
     }
 
-    // Planner notes: each document belongs to one teacher via the uid field
+    // Planner notes: only the teacher who owns the record can access it
     match /plannerNotes/{noteId} {
       allow read, update, delete: if request.auth != null
                                   && resource.data.uid == request.auth.uid;
       allow create: if request.auth != null
                    && request.resource.data.uid == request.auth.uid;
-    }
-
-    // Keep existing open rules for other collections
-    match /{document=**} {
-      allow read, write;
     }
   }
 }
