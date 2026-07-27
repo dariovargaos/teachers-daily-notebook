@@ -14,6 +14,7 @@ import {
   LuCheck,
   LuChevronLeft,
   LuChevronRight,
+  LuCircleCheck,
   LuPencilLine,
   LuPlus,
   LuTrash2,
@@ -59,6 +60,7 @@ function eventKey(d: Date) {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 }
 
+const notesPerPage = 6;
 const remindersPerPage = 3;
 
 type Reminder = {
@@ -73,6 +75,7 @@ type PlannerNote = {
   date: string;
   text: string;
   uid: string;
+  done?: boolean;
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -113,6 +116,7 @@ export default function Home() {
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editNoteText, setEditNoteText] = useState("");
   const [newNoteText, setNewNoteText] = useState("");
+  const [notePage, setNotePage] = useState(0);
 
   const {
     addDocument: addNoteDoc,
@@ -139,6 +143,13 @@ export default function Home() {
       await deleteNoteDoc(id);
     },
     [deleteNoteDoc],
+  );
+
+  const toggleNote = useCallback(
+    async (id: string, currentDone: boolean) => {
+      await updateNoteDoc(id, { done: !currentDone });
+    },
+    [updateNoteDoc],
   );
 
   // ── Reminders — read via useCollection, write via useFirestore ──
@@ -200,11 +211,19 @@ export default function Home() {
     (safePage + 1) * remindersPerPage,
   );
 
+  const totalNotePages = Math.ceil(dateNotes.length / notesPerPage) || 1;
+  const safeNotePage = Math.min(notePage, totalNotePages - 1);
+  const pagedNotes = dateNotes.slice(
+    safeNotePage * notesPerPage,
+    (safeNotePage + 1) * notesPerPage,
+  );
+
   const shiftDay = (delta: number) => {
     const next = new Date(date);
     next.setDate(next.getDate() + delta);
     setDate(next);
     setReminderPage(0);
+    setNotePage(0);
   };
 
   const weekday = WEEKDAYS[date.getDay()];
@@ -348,6 +367,8 @@ export default function Home() {
               p={{ base: 6, sm: 8 }}
               boxShadow="0 30px 70px -40px oklch(0.3 0.06 60 / 0.3)"
               minH="55vh"
+              display="flex"
+              flexDirection="column"
             >
               <Box
                 as="label"
@@ -362,138 +383,19 @@ export default function Home() {
                 Teaching Focus
               </Box>
 
-              <Flex direction="column" gap={0}>
-                {dateNotes.length === 0 && (
-                  <Text fontSize="md" color="fg/30" py={3} fontStyle="italic">
-                    What are you teaching today? Add your first note below…
-                  </Text>
-                )}
-
-                {dateNotes.map((n, i) => (
-                  <Flex
-                    key={n.id}
-                    align="start"
-                    gap={3}
-                    py={2.5}
-                    px={2}
-                    mx={-2}
-                    borderBottomWidth="1px"
-                    borderColor="border/20"
-                    minW={0}
-                    overflow="hidden"
-                    rounded="lg"
-                    _hover={{ bg: "secondary.solid/20" }}
-                    role="group"
-                  >
-                    <Text
-                      as="span"
-                      flexShrink={0}
-                      color="primary.solid"
-                      fontSize="sm"
-                      lineHeight="1.8"
-                      minW="18px"
-                      textAlign="right"
-                    >
-                      {i + 1}.
-                    </Text>
-
-                    {editingNoteId === n.id ? (
-                      <>
-                        <Textarea
-                          flex={1}
-                          value={editNoteText}
-                          onChange={(e) => setEditNoteText(e.target.value)}
-                          autoFocus
-                          autoresize
-                          fontSize="md"
-                          lineHeight="relaxed"
-                          color="fg"
-                          p={0}
-                          resize="none"
-                          border={0}
-                          _focus={{ outline: "none", boxShadow: "none" }}
-                          onKeyDown={(e) => {
-                            if (
-                              e.key === "Enter" &&
-                              !e.shiftKey &&
-                              editNoteText.trim()
-                            ) {
-                              e.preventDefault();
-                              updateNote(n.id, editNoteText.trim());
-                              setEditingNoteId(null);
-                            }
-                            if (e.key === "Escape") setEditingNoteId(null);
-                          }}
-                        />
-                        <Flex direction="column" gap={1} flexShrink={0}>
-                          <IconButton
-                            variant="ghost"
-                            size="2xs"
-                            aria-label="Save"
-                            onClick={() => {
-                              if (editNoteText.trim())
-                                updateNote(n.id, editNoteText.trim());
-                              setEditingNoteId(null);
-                            }}
-                          >
-                            <LuCheck />
-                          </IconButton>
-                          <IconButton
-                            variant="ghost"
-                            size="2xs"
-                            aria-label="Cancel"
-                            onClick={() => setEditingNoteId(null)}
-                          >
-                            <LuX />
-                          </IconButton>
-                        </Flex>
-                      </>
-                    ) : (
-                      <>
-                        <Text
-                          flex={1}
-                          minW={0}
-                          fontSize="md"
-                          lineHeight="relaxed"
-                          color="fg/85"
-                          wordBreak="break-word"
-                        >
-                          {n.text}
-                        </Text>
-                        <Flex
-                          direction="column"
-                          gap={1}
-                          flexShrink={0}
-                          _groupHover={{ opacity: 1 }}
-                          transition="opacity 0.15s"
-                        >
-                          <IconButton
-                            variant="ghost"
-                            size="2xs"
-                            aria-label="Edit"
-                            onClick={() => {
-                              setEditingNoteId(n.id);
-                              setEditNoteText(n.text);
-                            }}
-                          >
-                            <LuPencilLine />
-                          </IconButton>
-                          <IconButton
-                            variant="ghost"
-                            size="2xs"
-                            aria-label="Delete"
-                            onClick={() => deleteNote(n.id)}
-                          >
-                            <LuTrash2 />
-                          </IconButton>
-                        </Flex>
-                      </>
-                    )}
-                  </Flex>
-                ))}
-
+              <Flex direction="column" gap={0} flex={1}>
                 {/* Add new note row */}
-                <Flex align="start" gap={3} py={2.5} px={2} mx={-2} minW={0}>
+                <Flex
+                  align="start"
+                  gap={3}
+                  py={2.5}
+                  px={2}
+                  mx={-2}
+                  mb={2}
+                  borderBottomWidth="1px"
+                  borderColor="border/30"
+                  minW={0}
+                >
                   <Text
                     as="span"
                     flexShrink={0}
@@ -547,7 +449,177 @@ export default function Home() {
                     <LuPlus />
                   </IconButton>
                 </Flex>
+
+                {dateNotes.length === 0 && (
+                  <Text fontSize="md" color="fg/30" py={3} fontStyle="italic">
+                    What are you teaching today? Add your first note above…
+                  </Text>
+                )}
+
+                {pagedNotes.map((n, i) => (
+                  <Flex
+                    key={n.id}
+                    align="start"
+                    gap={3}
+                    py={2.5}
+                    px={2}
+                    mx={-2}
+                    borderBottomWidth="1px"
+                    borderColor="border/20"
+                    minW={0}
+                    overflow="hidden"
+                    rounded="lg"
+                    _hover={{ bg: "secondary.solid/20" }}
+                    role="group"
+                  >
+                    <Text
+                      as="span"
+                      flexShrink={0}
+                      color="primary.solid"
+                      fontSize="sm"
+                      lineHeight="1.8"
+                      minW="18px"
+                      textAlign="right"
+                    >
+                      {safeNotePage * notesPerPage + i + 1}.
+                    </Text>
+
+                    {editingNoteId === n.id ? (
+                      <>
+                        <Textarea
+                          flex={1}
+                          value={editNoteText}
+                          onChange={(e) => setEditNoteText(e.target.value)}
+                          autoFocus
+                          autoresize
+                          fontSize="md"
+                          lineHeight="relaxed"
+                          color="fg"
+                          p={0}
+                          resize="none"
+                          border={0}
+                          _focus={{ outline: "none", boxShadow: "none" }}
+                          onKeyDown={(e) => {
+                            if (
+                              e.key === "Enter" &&
+                              !e.shiftKey &&
+                              editNoteText.trim()
+                            ) {
+                              e.preventDefault();
+                              updateNote(n.id, editNoteText.trim());
+                              setEditingNoteId(null);
+                            }
+                            if (e.key === "Escape") setEditingNoteId(null);
+                          }}
+                        />
+                        <Flex gap={1} flexShrink={0}>
+                          <IconButton
+                            variant="ghost"
+                            size="2xs"
+                            aria-label="Save"
+                            onClick={() => {
+                              if (editNoteText.trim())
+                                updateNote(n.id, editNoteText.trim());
+                              setEditingNoteId(null);
+                            }}
+                          >
+                            <LuCheck />
+                          </IconButton>
+                          <IconButton
+                            variant="ghost"
+                            size="2xs"
+                            aria-label="Cancel"
+                            onClick={() => setEditingNoteId(null)}
+                          >
+                            <LuX />
+                          </IconButton>
+                        </Flex>
+                      </>
+                    ) : (
+                      <>
+                        <Text
+                          flex={1}
+                          minW={0}
+                          fontSize="md"
+                          lineHeight="relaxed"
+                          color={n.done ? "fg/35" : "fg/85"}
+                          wordBreak="break-word"
+                          textDecoration={n.done ? "line-through" : "none"}
+                          transition="color 0.2s, text-decoration 0.2s"
+                        >
+                          {n.text}
+                        </Text>
+                        <Flex
+                          gap={1}
+                          flexShrink={0}
+                          _groupHover={{ opacity: 1 }}
+                          transition="opacity 0.15s"
+                        >
+                          <IconButton
+                            variant="ghost"
+                            size="2xs"
+                            aria-label={
+                              n.done ? "Mark as undone" : "Mark as done"
+                            }
+                            color={n.done ? "green.500" : undefined}
+                            onClick={() => toggleNote(n.id, !!n.done)}
+                          >
+                            <LuCircleCheck />
+                          </IconButton>
+                          <IconButton
+                            variant="ghost"
+                            size="2xs"
+                            aria-label="Edit"
+                            onClick={() => {
+                              setEditingNoteId(n.id);
+                              setEditNoteText(n.text);
+                            }}
+                          >
+                            <LuPencilLine />
+                          </IconButton>
+                          <IconButton
+                            variant="ghost"
+                            size="2xs"
+                            aria-label="Delete"
+                            onClick={() => deleteNote(n.id)}
+                          >
+                            <LuTrash2 />
+                          </IconButton>
+                        </Flex>
+                      </>
+                    )}
+                  </Flex>
+                ))}
               </Flex>
+
+              {/* Notes pagination — pinned to canvas bottom */}
+              {totalNotePages > 1 && (
+                <Flex align="center" justify="space-between" pt={2} pb={1}>
+                  <IconButton
+                    variant="ghost"
+                    size="2xs"
+                    aria-label="Previous page"
+                    disabled={safeNotePage === 0}
+                    onClick={() => setNotePage((p) => Math.max(0, p - 1))}
+                  >
+                    <LuChevronLeft />
+                  </IconButton>
+                  <Text fontSize="10px" color="muted.contrast/70">
+                    {safeNotePage + 1} / {totalNotePages}
+                  </Text>
+                  <IconButton
+                    variant="ghost"
+                    size="2xs"
+                    aria-label="Next page"
+                    disabled={safeNotePage >= totalNotePages - 1}
+                    onClick={() =>
+                      setNotePage((p) => Math.min(totalNotePages - 1, p + 1))
+                    }
+                  >
+                    <LuChevronRight />
+                  </IconButton>
+                </Flex>
+              )}
             </Box>
           </Box>
 
@@ -579,6 +651,7 @@ export default function Home() {
                   nd.setHours(0, 0, 0, 0);
                   setDate(nd);
                   setReminderPage(0);
+                  setNotePage(0);
                 }}
                 eventDates={eventDates}
               />
