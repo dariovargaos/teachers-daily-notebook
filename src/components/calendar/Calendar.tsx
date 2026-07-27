@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { Box, Button, Flex, Grid, Text } from "@chakra-ui/react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
@@ -31,15 +31,15 @@ export default function Calendar({
     new Date(month.getFullYear(), month.getMonth(), 1),
   );
 
-  // Sync viewMonth when prop changes
-  const propKey = `${month.getFullYear()}-${month.getMonth()}`;
-  const viewKey = `${viewMonth.getFullYear()}-${viewMonth.getMonth()}`;
-  if (propKey !== viewKey) {
-    // Sync on next render
-    queueMicrotask(() =>
-      setViewMonth(new Date(month.getFullYear(), month.getMonth(), 1)),
-    );
-  }
+  // Sync viewMonth only when the month prop actually changes from outside
+  const prevMonthKey = useRef(`${month.getFullYear()}-${month.getMonth()}`);
+  useEffect(() => {
+    const key = `${month.getFullYear()}-${month.getMonth()}`;
+    if (key !== prevMonthKey.current) {
+      prevMonthKey.current = key;
+      setViewMonth(new Date(month.getFullYear(), month.getMonth(), 1));
+    }
+  }, [month]);
 
   const days = useMemo(() => {
     const y = viewMonth.getFullYear();

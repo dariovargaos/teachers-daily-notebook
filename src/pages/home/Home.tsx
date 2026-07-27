@@ -59,6 +59,8 @@ function eventKey(d: Date) {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 }
 
+const remindersPerPage = 3;
+
 type Reminder = {
   id: string;
   date: string;
@@ -150,6 +152,7 @@ export default function Home() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const [newReminderText, setNewReminderText] = useState("");
+  const [reminderPage, setReminderPage] = useState(0);
 
   // Derived: Date objects for calendar dots (dates with ≥1 reminder)
   const eventDates = useMemo(
@@ -189,10 +192,19 @@ export default function Home() {
     [deleteReminderDoc],
   );
 
+  const totalReminderPages =
+    Math.ceil(dateReminders.length / remindersPerPage) || 1;
+  const safePage = Math.min(reminderPage, totalReminderPages - 1);
+  const pagedReminders = dateReminders.slice(
+    safePage * remindersPerPage,
+    (safePage + 1) * remindersPerPage,
+  );
+
   const shiftDay = (delta: number) => {
     const next = new Date(date);
     next.setDate(next.getDate() + delta);
     setDate(next);
+    setReminderPage(0);
   };
 
   const weekday = WEEKDAYS[date.getDay()];
@@ -566,6 +578,7 @@ export default function Home() {
                   const nd = new Date(d);
                   nd.setHours(0, 0, 0, 0);
                   setDate(nd);
+                  setReminderPage(0);
                 }}
                 eventDates={eventDates}
               />
@@ -619,10 +632,10 @@ export default function Home() {
                   </Text>
                 )}
 
-                {dateReminders.map((r) => (
+                {pagedReminders.map((r) => (
                   <Flex
                     key={r.id}
-                    align="center"
+                    align={editingId === r.id ? "start" : "center"}
                     gap={2}
                     py={1.5}
                     px={1}
@@ -644,21 +657,25 @@ export default function Home() {
 
                     {editingId === r.id ? (
                       <>
-                        <Input
+                        <Textarea
                           flex={1}
                           value={editText}
                           onChange={(e) => setEditText(e.target.value)}
-                          size="sm"
                           autoFocus
+                          autoresize
                           fontSize="sm"
                           color="fg"
-                          variant="flushed"
-                          _focus={{
-                            boxShadow: "none",
-                            borderColor: "primary.solid/40",
-                          }}
+                          p={0}
+                          resize="none"
+                          border={0}
+                          _focus={{ outline: "none", boxShadow: "none" }}
                           onKeyDown={(e) => {
-                            if (e.key === "Enter" && editText.trim()) {
+                            if (
+                              e.key === "Enter" &&
+                              !e.shiftKey &&
+                              editText.trim()
+                            ) {
+                              e.preventDefault();
                               updateReminder(r.id, editText.trim());
                               setEditingId(null);
                             }
@@ -693,8 +710,10 @@ export default function Home() {
                           minW={0}
                           fontSize="sm"
                           color="fg"
-                          lineClamp={3}
                           wordBreak="break-word"
+                          maxH="4.5em"
+                          overflowY="auto"
+                          css={{ scrollbarWidth: "thin" }}
                         >
                           {r.text}
                         </Text>
@@ -725,6 +744,37 @@ export default function Home() {
                     )}
                   </Flex>
                 ))}
+
+                {/* ── Pagination ── */}
+                {totalReminderPages > 1 && (
+                  <Flex align="center" justify="space-between" pt={2} pb={1}>
+                    <IconButton
+                      variant="ghost"
+                      size="2xs"
+                      aria-label="Previous page"
+                      disabled={safePage === 0}
+                      onClick={() => setReminderPage((p) => Math.max(0, p - 1))}
+                    >
+                      <LuChevronLeft />
+                    </IconButton>
+                    <Text fontSize="10px" color="muted.contrast/70">
+                      {safePage + 1} / {totalReminderPages}
+                    </Text>
+                    <IconButton
+                      variant="ghost"
+                      size="2xs"
+                      aria-label="Next page"
+                      disabled={safePage >= totalReminderPages - 1}
+                      onClick={() =>
+                        setReminderPage((p) =>
+                          Math.min(totalReminderPages - 1, p + 1),
+                        )
+                      }
+                    >
+                      <LuChevronRight />
+                    </IconButton>
+                  </Flex>
+                )}
 
                 {/* ── Add new reminder ── */}
                 <Flex align="center" gap={2} py={1.5} px={1} minW={0}>
