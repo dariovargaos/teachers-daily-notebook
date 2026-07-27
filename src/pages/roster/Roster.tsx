@@ -90,15 +90,18 @@ export default function Roster() {
 
   const { data: roster = [], isLoading: rosterLoading } =
     useCollection<Student>("students");
-  const { addDocument, deleteDocument } = useFirestore("students");
+  const { addDocument, deleteDocument, isAddingDocument, deletingDocumentId } =
+    useFirestore("students");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
   const addStudent = useCallback(async () => {
     const f = firstName.trim();
     const l = lastName.trim();
     if (!f && !l) return;
-    await addDocument({ firstName: f, lastName: l });
+    await addDocument({ firstName: capitalize(f), lastName: capitalize(l) });
     setFirstName("");
     setLastName("");
   }, [firstName, lastName, addDocument]);
@@ -211,6 +214,7 @@ export default function Roster() {
 
               <Button
                 onClick={addStudent}
+                loading={isAddingDocument}
                 rounded="xl"
                 bg="primary.solid"
                 color="primary.contrast"
@@ -231,99 +235,111 @@ export default function Roster() {
 
           {/* Student list */}
           <Box mt={8}>
-            {rosterLoading ? (
-              <Box
-                rounded="2xl"
-                borderWidth="1px"
-                borderColor="border"
-                bg="secondary.solid/30"
-                py={16}
-                textAlign="center"
-                fontSize="sm"
-                color="muted.contrast"
-              >
-                Loading students…
-              </Box>
-            ) : roster.length === 0 ? (
-              <Box
-                rounded="2xl"
-                borderWidth="1px"
-                borderStyle="dashed"
-                borderColor="border"
-                bg="secondary.solid/30"
-                py={16}
-                textAlign="center"
-                fontSize="sm"
-                color="muted.contrast"
-              >
-                No students yet. Add your first student above.
-              </Box>
-            ) : (
-              <Box
-                as="ul"
-                listStyleType="none"
-                m={0}
-                p={0}
-                rounded="2xl"
-                borderWidth="1px"
-                borderColor="border"
-                overflow="hidden"
-              >
-                {roster.map((student, index) => (
-                  <Box
-                    key={student.id}
-                    as="li"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    gap={3}
-                    px={5}
-                    py={3.5}
-                    bg="secondary.solid/40"
-                    borderBottomWidth={index < roster.length - 1 ? "1px" : 0}
-                    borderColor="border"
-                    transition="background 0.15s"
-                    _hover={{
-                      bg: "secondary.solid/50",
-                      "& .delete-btn": { opacity: 1 },
-                    }}
-                  >
-                    <Flex align="center" gap={3} minW={0}>
-                      <Box minW={0}>
-                        <Text
-                          truncate
-                          fontSize="sm"
-                          fontWeight="medium"
-                          color="fg"
-                        >
-                          {index + 1}. {student.lastName} {student.firstName}
-                        </Text>
-                      </Box>
-                    </Flex>
-                    <Button
-                      onClick={() => removeStudent(student.id)}
-                      aria-label={`Remove ${student.lastName} ${student.firstName}`}
-                      className="delete-btn"
-                      variant="ghost"
-                      h={8}
-                      w={8}
-                      minW={0}
-                      p={0}
-                      rounded="lg"
-                      opacity={0}
-                      color="muted.contrast"
-                      transition="opacity 0.15s"
+            {(() => {
+              const sortedRoster = [...roster].sort((a, b) => {
+                const last = a.lastName.localeCompare(b.lastName);
+                return last !== 0
+                  ? last
+                  : a.firstName.localeCompare(b.firstName);
+              });
+              return rosterLoading ? (
+                <Box
+                  rounded="2xl"
+                  borderWidth="1px"
+                  borderColor="border"
+                  bg="secondary.solid/30"
+                  py={16}
+                  textAlign="center"
+                  fontSize="sm"
+                  color="muted.contrast"
+                >
+                  Loading students…
+                </Box>
+              ) : sortedRoster.length === 0 ? (
+                <Box
+                  rounded="2xl"
+                  borderWidth="1px"
+                  borderStyle="dashed"
+                  borderColor="border"
+                  bg="secondary.solid/30"
+                  py={16}
+                  textAlign="center"
+                  fontSize="sm"
+                  color="muted.contrast"
+                >
+                  No students yet. Add your first student above.
+                </Box>
+              ) : (
+                <Box
+                  as="ul"
+                  listStyleType="none"
+                  m={0}
+                  p={0}
+                  rounded="2xl"
+                  borderWidth="1px"
+                  borderColor="border"
+                  overflow="hidden"
+                >
+                  {sortedRoster.map((student, index) => (
+                    <Box
+                      key={student.id}
+                      as="li"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      gap={3}
+                      px={5}
+                      py={3.5}
+                      bg="secondary.solid/40"
+                      borderBottomWidth={
+                        index < sortedRoster.length - 1 ? "1px" : 0
+                      }
+                      borderColor="border"
+                      transition="background 0.15s"
                       _hover={{
-                        bg: "destructive.solid/10",
-                        color: "destructive.fg",
+                        bg: "secondary.solid/50",
+                        "& .delete-btn": { opacity: 1 },
                       }}
                     >
-                      <LuTrash2 />
-                    </Button>
-                  </Box>
-                ))}
-              </Box>
-            )}
+                      <Flex align="center" gap={3} minW={0}>
+                        <Box minW={0}>
+                          <Text
+                            truncate
+                            fontSize="sm"
+                            fontWeight="medium"
+                            color="fg"
+                          >
+                            {index + 1}. {student.lastName} {student.firstName}
+                          </Text>
+                        </Box>
+                      </Flex>
+                      <Button
+                        onClick={() => removeStudent(student.id)}
+                        aria-label={`Remove ${student.lastName} ${student.firstName}`}
+                        className="delete-btn"
+                        loading={deletingDocumentId === student.id}
+                        disabled={deletingDocumentId !== null}
+                        variant="ghost"
+                        h={8}
+                        w={8}
+                        minW={0}
+                        p={0}
+                        rounded="lg"
+                        opacity={deletingDocumentId === student.id ? 1 : 0}
+                        color="muted.contrast"
+                        transition="opacity 0.15s"
+                        _hover={{
+                          bg: "destructive.solid/10",
+                          color: "destructive.fg",
+                        }}
+                      >
+                        <LuTrash2 />
+                      </Button>
+                    </Box>
+                  ))}
+                </Box>
+              );
+            })()}
           </Box>
         </Shell>
 

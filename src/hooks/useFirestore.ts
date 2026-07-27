@@ -126,5 +126,13 @@ export const useFirestore = (collectionName: string) => {
     await updateDocumentMutation.mutateAsync({ id, updates });
   };
 
-  return { addDocument, deleteDocument, updateDocument };
+  return {
+    addDocument,
+    deleteDocument,
+    updateDocument,
+    isAddingDocument: addDocumentMutation.isPending,
+    deletingDocumentId: deleteDocumentMutation.isPending
+      ? (deleteDocumentMutation.variables?.id ?? null)
+      : null,
+  };
 };
