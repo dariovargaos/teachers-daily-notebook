@@ -137,7 +137,7 @@ export default function Signin() {
               letterSpacing="0.22em"
               color="gold"
             >
-              Welcome back
+              Dobrodošli natrag
             </Text>
             <Heading
               as="h1"
@@ -148,9 +148,9 @@ export default function Signin() {
               lineHeight="1.05"
               letterSpacing="tight"
             >
-              A quiet place
+              Mirno mjesto
               <br />
-              for loud days.
+              za burne dane.
             </Heading>
             <Text
               mt={4}
@@ -159,8 +159,8 @@ export default function Signin() {
               opacity={0.75}
               lineHeight="relaxed"
             >
-              Pick up the chalk where you left off. Your lessons, reminders and
-              reflections are right where you wrote them.
+              Nastavi tamo gdje si stao/la. Tvoje lekcije, podsjetnici i
+              bilješke su točno tamo gdje si ih zapisao/la.
             </Text>
           </Box>
 
@@ -173,8 +173,8 @@ export default function Signin() {
             letterSpacing="0.2em"
             opacity={0.6}
           >
-            <Text as="span">Vol. {new Date().getFullYear()}</Text>
-            <Text as="span">A planner for modern teachers</Text>
+            <Text as="span">God. {new Date().getFullYear()}</Text>
+            <Text as="span">Planer za moderne učitelje</Text>
           </HStack>
         </Flex>
 
@@ -220,7 +220,7 @@ export default function Signin() {
             letterSpacing="0.22em"
             color="gold"
           >
-            Sign in
+            Prijava
           </Text>
           <Heading
             as="h2"
@@ -232,10 +232,10 @@ export default function Signin() {
             color="fg"
             lineHeight="1.05"
           >
-            Good to see you
+            Lijepo te vidjeti
           </Heading>
           <Text mt={3} fontSize="sm" color="fg.muted">
-            Don&apos;t have an account?{" "}
+            Nemaš račun?{" "}
             <Box
               asChild
               fontWeight="semibold"
@@ -246,7 +246,7 @@ export default function Signin() {
               textUnderlineOffset="4px"
               _hover={{ opacity: 0.8 }}
             >
-              <RouterLink to="/signup">Create one</RouterLink>
+              <RouterLink to="/signup">Otvori ga</RouterLink>
             </Box>
           </Text>
 
@@ -284,7 +284,7 @@ export default function Signin() {
 
             {/* Password field */}
             <Field
-              label="Password"
+              label="Lozinka"
               icon={<LuLock />}
               trailing={
                 <Button
@@ -294,7 +294,7 @@ export default function Signin() {
                   color="fg.muted"
                   _hover={{ color: "fg" }}
                   transition="colors"
-                  aria-label={show ? "Hide password" : "Show password"}
+                  aria-label={show ? "Sakrij lozinku" : "Prikaži lozinku"}
                   bg="transparent"
                   border="none"
                   cursor="pointer"
@@ -327,7 +327,7 @@ export default function Signin() {
               <Checkbox.Root colorPalette="primary" variant="subtle">
                 <Checkbox.HiddenInput />
                 <Checkbox.Control />
-                <Checkbox.Label color="fg.muted">Remember me</Checkbox.Label>
+                <Checkbox.Label color="fg.muted">Zapamti me</Checkbox.Label>
               </Checkbox.Root>
               <Link
                 href="#"
@@ -335,7 +335,7 @@ export default function Signin() {
                 color="fg"
                 _hover={{ opacity: 0.8 }}
               >
-                Forgot password?
+                Zaboravljena lozinka?
               </Link>
             </HStack>
 
@@ -355,7 +355,7 @@ export default function Signin() {
               _active={{ transform: "scale(0.99)" }}
               boxShadow="0 18px 40px -20px oklch(0.2 0.05 50 / 0.6)"
             >
-              {isPending ? "Signing in..." : "Sign in"}
+              {isPending ? "Prijava u tijeku..." : "Prijavi se"}
               <LuArrowRight />
             </Button>
 
@@ -368,7 +368,7 @@ export default function Signin() {
               color="fg.muted/70"
             >
               <Separator flex="1" />
-              or
+              ili
               <Separator flex="1" />
             </HStack>
 
@@ -387,7 +387,7 @@ export default function Signin() {
               color="fg"
             >
               <GoogleIcon />
-              Continue with Google
+              Nastavi s Googleom
             </Button>
           </VStack>
 
@@ -399,7 +399,7 @@ export default function Signin() {
             color="fg.muted/60"
             textAlign="center"
           >
-            By signing in you agree to the quiet little terms
+            Prijavom prihvaćaš uvjete korištenja
           </Text>
         </Box>
       </Grid>

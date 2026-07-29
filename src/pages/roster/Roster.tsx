@@ -147,7 +147,7 @@ export default function Roster() {
                 letterSpacing="0.2em"
                 color="muted.contrast"
               >
-                Class Roster
+                Razredni popis
               </Text>
               <Text
                 textStyle="display"
@@ -157,11 +157,11 @@ export default function Roster() {
                 letterSpacing="tight"
                 color="fg"
               >
-                My students
+                Moji učenici
               </Text>
               <Text mt={2} fontSize="sm" color="muted.contrast">
-                {roster.length} {roster.length === 1 ? "student" : "students"}{" "}
-                enrolled
+                {roster.length} {roster.length === 1 ? "učenik" : "učenika"}{" "}
+                upisano
               </Text>
             </Box>
           </Flex>
@@ -183,7 +183,7 @@ export default function Roster() {
                   color="muted.contrast"
                   mb={1.5}
                 >
-                  Last Name
+                  Prezime
                 </Text>
                 <Input
                   value={lastName}
@@ -202,7 +202,7 @@ export default function Roster() {
                   color="muted.contrast"
                   mb={1.5}
                 >
-                  First Name
+                  Ime
                 </Text>
                 <Input
                   value={firstName}
@@ -228,7 +228,7 @@ export default function Roster() {
                 transition="all 0.15s"
               >
                 <LuPlus style={{ marginRight: "0.375rem" }} />
-                Add
+                Dodaj
               </Button>
             </Flex>
           </Box>
@@ -253,7 +253,7 @@ export default function Roster() {
                   fontSize="sm"
                   color="muted.contrast"
                 >
-                  Loading students…
+                  Učitavanje učenika…
                 </Box>
               ) : sortedRoster.length === 0 ? (
                 <Box
@@ -267,7 +267,7 @@ export default function Roster() {
                   fontSize="sm"
                   color="muted.contrast"
                 >
-                  No students yet. Add your first student above.
+                  Još nema učenika. Dodaj prvog učenika iznad.
                 </Box>
               ) : (
                 <Box
@@ -315,7 +315,7 @@ export default function Roster() {
                       </Flex>
                       <Button
                         onClick={() => removeStudent(student.id)}
-                        aria-label={`Remove ${student.lastName} ${student.firstName}`}
+                        aria-label={`Ukloni ${student.lastName} ${student.firstName}`}
                         className="delete-btn"
                         loading={deletingDocumentId === student.id}
                         disabled={deletingDocumentId !== null}
@@ -352,7 +352,7 @@ export default function Roster() {
           letterSpacing="0.2em"
           color="muted.contrast/70"
         >
-          <Text>Atelier · A quiet planner for modern teachers</Text>
+          <Text>Atelier · Mirni planer za moderne učitelje</Text>
         </Flex>
       </Container>
     </Box>

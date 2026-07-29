@@ -114,7 +114,7 @@ export default function Signup() {
             letterSpacing="0.22em"
             color="gold"
           >
-            Create account
+            Otvori račun
           </Text>
           <Heading
             as="h2"
@@ -126,12 +126,12 @@ export default function Signup() {
             color="fg"
             lineHeight="1.05"
           >
-            Begin your
+            Započni svoj
             <br />
-            notebook
+            rokovnik
           </Heading>
           <Text mt={3} fontSize="sm" color="fg.muted">
-            Already a member?{" "}
+            Već imaš račun?{" "}
             <Box
               asChild
               fontWeight="semibold"
@@ -142,7 +142,7 @@ export default function Signup() {
               textUnderlineOffset="4px"
               _hover={{ opacity: 0.8 }}
             >
-              <RouterLink to="/signin">Sign in</RouterLink>
+              <RouterLink to="/signin">Prijavi se</RouterLink>
             </Box>
           </Text>
 
@@ -161,7 +161,7 @@ export default function Signup() {
             )}
 
             {/* First name field */}
-            <Field label="First name" icon={<LuUser />}>
+            <Field label="Ime" icon={<LuUser />}>
               <Input
                 type="text"
                 required
@@ -178,7 +178,7 @@ export default function Signup() {
             </Field>
 
             {/* Last name field */}
-            <Field label="Last name" icon={<LuUser />}>
+            <Field label="Prezime" icon={<LuUser />}>
               <Input
                 type="text"
                 required
@@ -214,7 +214,7 @@ export default function Signup() {
 
             {/* Password field */}
             <Field
-              label="Password"
+              label="Lozinka"
               icon={<LuLock />}
               trailing={
                 <Button
@@ -224,7 +224,7 @@ export default function Signup() {
                   color="fg.muted"
                   _hover={{ color: "fg" }}
                   transition="colors"
-                  aria-label={show ? "Hide password" : "Show password"}
+                  aria-label={show ? "Sakrij lozinku" : "Prikaži lozinku"}
                   bg="transparent"
                   border="none"
                   cursor="pointer"
@@ -263,7 +263,7 @@ export default function Signup() {
                     color="fg.muted/50"
                     letterSpacing="0.04em"
                   >
-                    Good to go
+                    Spremno
                   </Text>
                 </>
               ) : (
@@ -272,7 +272,7 @@ export default function Signup() {
                   color="fg.muted/40"
                   letterSpacing="0.04em"
                 >
-                  At least 8 characters
+                  Najmanje 8 znakova
                 </Text>
               )}
             </HStack>
@@ -282,23 +282,23 @@ export default function Signup() {
               <Checkbox.HiddenInput />
               <Checkbox.Control />
               <Checkbox.Label fontSize="xs" color="fg.muted">
-                I agree to the{" "}
+                Prihvaćam{" "}
                 <Link
                   href="#"
                   fontWeight="semibold"
                   color="fg"
                   _hover={{ opacity: 0.8 }}
                 >
-                  Terms
+                  Uvjete
                 </Link>{" "}
-                and the{" "}
+                i{" "}
                 <Link
                   href="#"
                   fontWeight="semibold"
                   color="fg"
                   _hover={{ opacity: 0.8 }}
                 >
-                  Privacy Notice
+                  Pravila privatnosti
                 </Link>
                 .
               </Checkbox.Label>
@@ -320,7 +320,7 @@ export default function Signup() {
               _active={{ transform: "scale(0.99)" }}
               boxShadow="0 18px 40px -20px oklch(0.2 0.05 50 / 0.6)"
             >
-              {isPending ? "Creating account..." : "Create account"}
+              {isPending ? "Otvaranje računa..." : "Otvori račun"}
               <LuArrowRight />
             </Button>
 
@@ -333,7 +333,7 @@ export default function Signup() {
               color="fg.muted/70"
             >
               <Separator flex="1" />
-              or
+              ili
               <Separator flex="1" />
             </HStack>
 
@@ -426,7 +426,7 @@ export default function Signup() {
               letterSpacing="0.22em"
               color="gold"
             >
-              For modern teachers
+              Za moderne učitelje
             </Text>
             <Heading
               as="h1"
@@ -437,9 +437,9 @@ export default function Signup() {
               lineHeight="1.05"
               letterSpacing="tight"
             >
-              The planner that
+              Planer koji
               <br />
-              stays out of the way.
+              ne smeta.
             </Heading>
             <VStack
               as="ul"
@@ -450,9 +450,9 @@ export default function Signup() {
               pl={0}
             >
               {[
-                "A page for every day, kept forever.",
-                "Exams and reminders, dotted on your calendar.",
-                "Your students, neatly in a single roster.",
+                "Stranica za svaki dan, zauvijek.",
+                "Ispiti i podsjetnici, označeni na kalendaru.",
+                "Tvoji učenici, uredno na jednom popisu.",
               ].map((line) => (
                 <HStack as="li" key={line} gap={2.5} align="start">
                   <Flex
@@ -483,7 +483,7 @@ export default function Signup() {
             letterSpacing="0.2em"
             opacity={0.6}
           >
-            A quiet planner, made for the loud months
+            Mirni planer, stvoren za burne mjesece
           </Text>
         </Flex>
       </Grid>

@@ -40,19 +40,19 @@ export const useSignup = () => {
       const code = (err as { code?: string }).code;
       switch (code) {
         case "auth/email-already-in-use":
-          setError("This email address is already in use.");
+          setError("Ova email adresa se već koristi.");
           break;
         case "auth/invalid-email":
-          setError("Invalid email address.");
+          setError("Nevažeća email adresa.");
           break;
         case "auth/missing-password":
-          setError("You must enter a password.");
+          setError("Moraš unijeti lozinku.");
           break;
         case "auth/weak-password":
-          setError("Password should be at least 6 characters.");
+          setError("Lozinka mora imati najmanje 6 znakova.");
           break;
         case "permission-denied":
-          setError("Unable to save your profile. Please try again.");
+          setError("Nije moguće spremiti profil. Pokušaj ponovno.");
           break;
         default:
           setError((err as Error).message);

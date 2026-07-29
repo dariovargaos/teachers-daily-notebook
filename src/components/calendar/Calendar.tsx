@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { Box, Button, Flex, Grid, Text } from "@chakra-ui/react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
-const WEEKDAY_LABELS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+const WEEKDAY_LABELS = ["Ne", "Po", "Ut", "Sr", "Če", "Pe", "Su"];
 
 interface CalendarProps {
   selected: Date;
@@ -56,7 +56,7 @@ export default function Calendar({
     return cells;
   }, [viewMonth]);
 
-  const monthLabel = viewMonth.toLocaleDateString("en-US", {
+  const monthLabel = viewMonth.toLocaleDateString("hr-HR", {
     month: "long",
     year: "numeric",
   });
@@ -87,7 +87,7 @@ export default function Calendar({
             variant="ghost"
             rounded="full"
             onClick={() => shiftMonth(-1)}
-            aria-label="Previous month"
+            aria-label="Prethodni mjesec"
           >
             <LuChevronLeft />
           </Button>
@@ -96,7 +96,7 @@ export default function Calendar({
             variant="ghost"
             rounded="full"
             onClick={() => shiftMonth(1)}
-            aria-label="Next month"
+            aria-label="Sljedeći mjesec"
           >
             <LuChevronRight />
           </Button>
@@ -134,7 +134,7 @@ export default function Calendar({
             <Box
               key={day.toISOString()}
               as="button"
-              aria-label={day.toLocaleDateString("en-US", {
+              aria-label={day.toLocaleDateString("hr-HR", {
                 weekday: "long",
                 month: "long",
                 day: "numeric",

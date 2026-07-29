@@ -24,7 +24,7 @@ export const useLogin = () => {
         case "auth/invalid-email":
         case "auth/invalid-credential":
         case "auth/invalid-login-credentials":
-          setError("Incorrect email or password.");
+          setError("Netočan email ili lozinka.");
           break;
         default:
           setError((err as Error).message);

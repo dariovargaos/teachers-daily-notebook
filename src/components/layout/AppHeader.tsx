@@ -56,7 +56,7 @@ export default function AppHeader({ teacherFirstName, year }: Props) {
               color="muted.contrast"
               mb={0.5}
             >
-              Good day, {teacherFirstName}
+              Dobar dan, {teacherFirstName}
             </Text>
           )}
           <Text
@@ -104,7 +104,7 @@ export default function AppHeader({ teacherFirstName, year }: Props) {
           _hover={{ color: "fg" }}
           transition="all 0.15s"
         >
-          Planner
+          Planer
         </Button>
         <Button
           onClick={() => navigate("/roster")}
@@ -120,13 +120,13 @@ export default function AppHeader({ teacherFirstName, year }: Props) {
           _hover={{ color: "fg" }}
           transition="all 0.15s"
         >
-          Roster
+          Razred
         </Button>
 
         <Button
           onClick={logout}
           loading={isPending}
-          aria-label="Sign out"
+          aria-label="Odjava"
           variant="ghost"
           minW={0}
           rounded="full"
@@ -138,7 +138,7 @@ export default function AppHeader({ teacherFirstName, year }: Props) {
           _active={{ transform: "scale(0.95)" }}
           transition="all 0.15s"
         >
-          Log out
+          Odjava
           <LuLogOut />
         </Button>
       </Flex>
@@ -153,7 +153,7 @@ export default function AppHeader({ teacherFirstName, year }: Props) {
         >
           <Drawer.Trigger asChild>
             <IconButton
-              aria-label="Open menu"
+              aria-label="Otvori izbornik"
               variant="ghost"
               rounded="full"
               borderWidth="1px"
@@ -171,7 +171,7 @@ export default function AppHeader({ teacherFirstName, year }: Props) {
               <Drawer.Content bg="bg">
                 <Drawer.Header borderBottomWidth="1px" borderColor="border/50">
                   <Drawer.Title fontSize="sm" fontWeight="semibold">
-                    Navigation
+                    Navigacija
                   </Drawer.Title>
                   <Drawer.CloseTrigger asChild>
                     <CloseButton
@@ -198,7 +198,7 @@ export default function AppHeader({ teacherFirstName, year }: Props) {
                       color={isPlanner ? "fg" : "muted.contrast"}
                       _hover={{ color: "fg", bg: "secondary.solid/40" }}
                     >
-                      Planner
+                      Planer
                     </Button>
                     <Button
                       onClick={() => {
@@ -214,7 +214,7 @@ export default function AppHeader({ teacherFirstName, year }: Props) {
                       color={isRoster ? "fg" : "muted.contrast"}
                       _hover={{ color: "fg", bg: "secondary.solid/40" }}
                     >
-                      Roster
+                      Razred
                     </Button>
                   </VStack>
                 </Drawer.Body>
@@ -229,7 +229,7 @@ export default function AppHeader({ teacherFirstName, year }: Props) {
                     color="muted.contrast"
                     _hover={{ color: "fg" }}
                   >
-                    Log out
+                    Odjava
                     <LuLogOut />
                   </Button>
                 </Drawer.Footer>

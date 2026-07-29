@@ -33,27 +33,27 @@ import AppHeader from "@/components/layout/AppHeader";
 // ═══════════════════════════════════════════════════════════════
 
 const WEEKDAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
+  "Ponedjeljak",
+  "Utorak",
+  "Srijeda",
+  "Četvrtak",
+  "Petak",
+  "Subota",
+  "Nedjelja",
 ];
 const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "Siječanj",
+  "Veljača",
+  "Ožujak",
+  "Travanj",
+  "Svibanj",
+  "Lipanj",
+  "Srpanj",
+  "Kolovoz",
+  "Rujan",
+  "Listopad",
+  "Studeni",
+  "Prosinac",
 ];
 
 function eventKey(d: Date) {
@@ -306,7 +306,7 @@ export default function Home() {
                       color="muted.contrast"
                     >
                       <Box h={1} w={1} rounded="full" bg="gold" />
-                      Today
+                      Danas
                     </Flex>
                   )}
                 </Flex>
@@ -316,7 +316,7 @@ export default function Home() {
               <Flex gap={2} mb={1} shrink={0}>
                 <Button
                   onClick={() => shiftDay(-1)}
-                  aria-label="Previous day"
+                  aria-label="Prethodni dan"
                   variant="ghost"
                   h={10}
                   w={10}
@@ -335,7 +335,7 @@ export default function Home() {
                 </Button>
                 <Button
                   onClick={() => shiftDay(1)}
-                  aria-label="Next day"
+                  aria-label="Sljedeći dan"
                   variant="ghost"
                   h={10}
                   w={10}
@@ -378,7 +378,7 @@ export default function Home() {
                 color="gold"
                 mb={4}
               >
-                Teaching Focus
+                Nastavni fokus
               </Box>
 
               <Flex direction="column" gap={0} flex={1}>
@@ -407,7 +407,7 @@ export default function Home() {
                   </Text>
                   <Textarea
                     flex={1}
-                    placeholder="Add a note…"
+                    placeholder="Dodaj bilješku…"
                     value={newNoteText}
                     onChange={(e) => setNewNoteText(e.target.value)}
                     autoresize
@@ -434,7 +434,7 @@ export default function Home() {
                   <IconButton
                     variant="ghost"
                     size="2xs"
-                    aria-label="Add note"
+                    aria-label="Dodaj bilješku"
                     flexShrink={0}
                     mt={1}
                     onClick={() => {
@@ -450,7 +450,7 @@ export default function Home() {
 
                 {dateNotes.length === 0 && (
                   <Text fontSize="md" color="fg/30" py={3} fontStyle="italic">
-                    What are you teaching today? Add your first note above…
+                    Što danas predaješ? Dodaj svoju prvu bilješku iznad…
                   </Text>
                 )}
 
@@ -514,7 +514,7 @@ export default function Home() {
                           <IconButton
                             variant="ghost"
                             size="2xs"
-                            aria-label="Save"
+                            aria-label="Spremi"
                             onClick={() => {
                               if (editNoteText.trim())
                                 updateNote(n.id, editNoteText.trim());
@@ -526,7 +526,7 @@ export default function Home() {
                           <IconButton
                             variant="ghost"
                             size="2xs"
-                            aria-label="Cancel"
+                            aria-label="Odustani"
                             onClick={() => setEditingNoteId(null)}
                           >
                             <LuX />
@@ -557,7 +557,7 @@ export default function Home() {
                             variant="ghost"
                             size="2xs"
                             aria-label={
-                              n.done ? "Mark as undone" : "Mark as done"
+                              n.done ? "Označi nedovršenim" : "Označi dovršenim"
                             }
                             color={n.done ? "green.500" : undefined}
                             onClick={() => toggleNote(n.id, !!n.done)}
@@ -567,7 +567,7 @@ export default function Home() {
                           <IconButton
                             variant="ghost"
                             size="2xs"
-                            aria-label="Edit"
+                            aria-label="Uredi"
                             onClick={() => {
                               setEditingNoteId(n.id);
                               setEditNoteText(n.text);
@@ -578,7 +578,7 @@ export default function Home() {
                           <IconButton
                             variant="ghost"
                             size="2xs"
-                            aria-label="Delete"
+                            aria-label="Obriši"
                             onClick={() => deleteNote(n.id)}
                           >
                             <LuTrash2 />
@@ -596,7 +596,7 @@ export default function Home() {
                   <IconButton
                     variant="ghost"
                     size="2xs"
-                    aria-label="Previous page"
+                    aria-label="Prethodna stranica"
                     disabled={safeNotePage === 0}
                     onClick={() => setNotePage((p) => Math.max(0, p - 1))}
                   >
@@ -608,7 +608,7 @@ export default function Home() {
                   <IconButton
                     variant="ghost"
                     size="2xs"
-                    aria-label="Next page"
+                    aria-label="Sljedeća stranica"
                     disabled={safeNotePage >= totalNotePages - 1}
                     onClick={() =>
                       setNotePage((p) => Math.min(totalNotePages - 1, p + 1))
@@ -674,7 +674,7 @@ export default function Home() {
                     letterSpacing="0.18em"
                     color="gold"
                   >
-                    Important
+                    Važno
                   </Text>
                   <Text
                     textStyle="display"
@@ -683,7 +683,7 @@ export default function Home() {
                     color="fg"
                     mt={0.5}
                   >
-                    Exams &amp; reminders
+                    Ispiti i podsjetnici
                   </Text>
                 </Box>
                 <Box
@@ -699,7 +699,7 @@ export default function Home() {
               <Flex direction="column" gap={1}>
                 {dateReminders.length === 0 && (
                   <Text fontSize="xs" color="muted.contrast/60" py={2}>
-                    No reminders for this day.
+                    Nema podsjetnika za ovaj dan.
                   </Text>
                 )}
 
@@ -756,7 +756,7 @@ export default function Home() {
                         <IconButton
                           variant="ghost"
                           size="2xs"
-                          aria-label="Save"
+                          aria-label="Spremi"
                           onClick={() => {
                             if (editText.trim())
                               updateReminder(r.id, editText.trim());
@@ -768,7 +768,7 @@ export default function Home() {
                         <IconButton
                           variant="ghost"
                           size="2xs"
-                          aria-label="Cancel"
+                          aria-label="Odustani"
                           onClick={() => setEditingId(null)}
                         >
                           <LuX />
@@ -791,7 +791,7 @@ export default function Home() {
                         <IconButton
                           variant="ghost"
                           size="2xs"
-                          aria-label="Edit"
+                          aria-label="Uredi"
                           _groupHover={{ opacity: 1 }}
                           transition="opacity 0.15s"
                           onClick={() => {
@@ -804,7 +804,7 @@ export default function Home() {
                         <IconButton
                           variant="ghost"
                           size="2xs"
-                          aria-label="Delete"
+                          aria-label="Obriši"
                           _groupHover={{ opacity: 1 }}
                           transition="opacity 0.15s"
                           onClick={() => deleteReminder(r.id)}
@@ -822,7 +822,7 @@ export default function Home() {
                     <IconButton
                       variant="ghost"
                       size="2xs"
-                      aria-label="Previous page"
+                      aria-label="Prethodna stranica"
                       disabled={safePage === 0}
                       onClick={() => setReminderPage((p) => Math.max(0, p - 1))}
                     >
@@ -834,7 +834,7 @@ export default function Home() {
                     <IconButton
                       variant="ghost"
                       size="2xs"
-                      aria-label="Next page"
+                      aria-label="Sljedeća stranica"
                       disabled={safePage >= totalReminderPages - 1}
                       onClick={() =>
                         setReminderPage((p) =>
@@ -860,7 +860,7 @@ export default function Home() {
                   </Text>
                   <Input
                     flex={1}
-                    placeholder="Add a reminder…"
+                    placeholder="Dodaj podsjetnik…"
                     value={newReminderText}
                     onChange={(e) => setNewReminderText(e.target.value)}
                     size="sm"
@@ -885,7 +885,7 @@ export default function Home() {
                   <IconButton
                     variant="ghost"
                     size="2xs"
-                    aria-label="Add reminder"
+                    aria-label="Dodaj podsjetnik"
                     onClick={() => {
                       if (newReminderText.trim()) {
                         addReminder(newReminderText.trim());
@@ -900,7 +900,7 @@ export default function Home() {
 
               <Flex mt={3} align="center" justify="space-between">
                 <Text fontSize="10px" color="muted.contrast">
-                  Hover a reminder to edit or delete it.
+                  Prijeđi preko podsjetnika za uređivanje ili brisanje.
                 </Text>
               </Flex>
             </Box>
@@ -916,7 +916,7 @@ export default function Home() {
           letterSpacing="0.2em"
           color="muted.contrast/70"
         >
-          <Text>Atelier · A quiet planner for modern teachers</Text>
+          <Text>Atelier · Mirni planer za moderne učitelje</Text>
         </Flex>
       </Container>
     </Box>
