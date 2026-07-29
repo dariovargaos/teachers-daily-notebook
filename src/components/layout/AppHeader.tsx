@@ -1,6 +1,17 @@
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router";
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
-import { LuNotebookPen, LuLogOut } from "react-icons/lu";
+import {
+  Box,
+  Button,
+  CloseButton,
+  Drawer,
+  Flex,
+  IconButton,
+  Portal,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
+import { LuNotebookPen, LuLogOut, LuMenu } from "react-icons/lu";
 import { useLogout } from "@/hooks/useLogout";
 
 interface Props {
@@ -12,6 +23,7 @@ export default function AppHeader({ teacherFirstName, year }: Props) {
   const { logout, isPending } = useLogout();
   const navigate = useNavigate();
   const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
   const isPlanner = location.pathname === "/";
   const isRoster = location.pathname === "/roster";
 
@@ -68,9 +80,10 @@ export default function AppHeader({ teacherFirstName, year }: Props) {
         </Box>
       </Flex>
 
-      {/* Nav tabs */}
+      {/* Desktop nav tabs — hidden on mobile */}
       <Flex
         as="nav"
+        hideBelow="sm"
         align="center"
         gap={1}
         rounded="full"
@@ -110,7 +123,6 @@ export default function AppHeader({ teacherFirstName, year }: Props) {
           Roster
         </Button>
 
-        {/* Logout */}
         <Button
           onClick={logout}
           loading={isPending}
@@ -130,6 +142,102 @@ export default function AppHeader({ teacherFirstName, year }: Props) {
           <LuLogOut />
         </Button>
       </Flex>
+
+      {/* Mobile hamburger menu — hidden on desktop */}
+      <Box hideFrom="sm">
+        <Drawer.Root
+          placement="end"
+          size="xs"
+          open={menuOpen}
+          onOpenChange={(e) => setMenuOpen(e.open)}
+        >
+          <Drawer.Trigger asChild>
+            <IconButton
+              aria-label="Open menu"
+              variant="ghost"
+              rounded="full"
+              borderWidth="1px"
+              borderColor="border/70"
+              bg="secondary.solid/85"
+              color="muted.contrast"
+              _hover={{ color: "fg" }}
+            >
+              <LuMenu />
+            </IconButton>
+          </Drawer.Trigger>
+          <Portal>
+            <Drawer.Backdrop />
+            <Drawer.Positioner>
+              <Drawer.Content bg="bg">
+                <Drawer.Header borderBottomWidth="1px" borderColor="border/50">
+                  <Drawer.Title fontSize="sm" fontWeight="semibold">
+                    Navigation
+                  </Drawer.Title>
+                  <Drawer.CloseTrigger asChild>
+                    <CloseButton
+                      size="sm"
+                      position="absolute"
+                      top={3}
+                      right={3}
+                    />
+                  </Drawer.CloseTrigger>
+                </Drawer.Header>
+                <Drawer.Body pt={4}>
+                  <VStack gap={2} align="stretch">
+                    <Button
+                      onClick={() => {
+                        navigate("/");
+                        setMenuOpen(false);
+                      }}
+                      variant="ghost"
+                      justifyContent="flex-start"
+                      rounded="lg"
+                      fontWeight="semibold"
+                      fontSize="sm"
+                      bg={isPlanner ? "secondary.solid/60" : "transparent"}
+                      color={isPlanner ? "fg" : "muted.contrast"}
+                      _hover={{ color: "fg", bg: "secondary.solid/40" }}
+                    >
+                      Planner
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        navigate("/roster");
+                        setMenuOpen(false);
+                      }}
+                      variant="ghost"
+                      justifyContent="flex-start"
+                      rounded="lg"
+                      fontWeight="semibold"
+                      fontSize="sm"
+                      bg={isRoster ? "secondary.solid/60" : "transparent"}
+                      color={isRoster ? "fg" : "muted.contrast"}
+                      _hover={{ color: "fg", bg: "secondary.solid/40" }}
+                    >
+                      Roster
+                    </Button>
+                  </VStack>
+                </Drawer.Body>
+                <Drawer.Footer borderTopWidth="1px" borderColor="border/50">
+                  <Button
+                    onClick={logout}
+                    loading={isPending}
+                    variant="outline"
+                    w="full"
+                    rounded="lg"
+                    fontSize="sm"
+                    color="muted.contrast"
+                    _hover={{ color: "fg" }}
+                  >
+                    Log out
+                    <LuLogOut />
+                  </Button>
+                </Drawer.Footer>
+              </Drawer.Content>
+            </Drawer.Positioner>
+          </Portal>
+        </Drawer.Root>
+      </Box>
     </Flex>
   );
 }
