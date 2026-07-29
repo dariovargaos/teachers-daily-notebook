@@ -20,7 +20,7 @@ import {
   LuTrash2,
   LuX,
 } from "react-icons/lu";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { useAuthContext } from "@/hooks/useAuthContext";
 import { useCollection } from "@/hooks/useCollection";
@@ -89,14 +89,12 @@ export default function Home() {
   // Fetch the teacher's first name from Firestore
   useEffect(() => {
     if (!user) return;
-    const fetchName = async () => {
-      const snap = await getDoc(doc(db, "users", user.uid));
+    const unsub = onSnapshot(doc(db, "users", user.uid), (snap) => {
       if (snap.exists()) {
-        const data = snap.data();
-        setTeacherFirstName(data.firstName ?? "");
+        setTeacherFirstName(snap.data().firstName ?? "");
       }
-    };
-    fetchName();
+    });
+    return () => unsub();
   }, [user]);
 
   const [date, setDate] = useState<Date>(() => {
