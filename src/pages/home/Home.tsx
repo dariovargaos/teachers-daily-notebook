@@ -912,11 +912,11 @@ export default function Home() {
           mt={10}
           justify="center"
           fontSize="10px"
-          textTransform="uppercase"
           letterSpacing="0.2em"
           color="muted.contrast/70"
         >
-          <Text>Atelier · Mirni planer za moderne učitelje</Text>
+          <Text>e-Planer</Text>
+          <Text textTransform="uppercase"> · Planer za moderne učitelje</Text>
         </Flex>
       </Container>
     </Box>

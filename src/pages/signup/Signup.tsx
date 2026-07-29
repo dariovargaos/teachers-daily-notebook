@@ -116,20 +116,6 @@ export default function Signup() {
           >
             Otvori račun
           </Text>
-          <Heading
-            as="h2"
-            fontFamily="display"
-            mt={2}
-            fontSize={{ base: "4xl", sm: "5xl" }}
-            fontWeight="normal"
-            letterSpacing="tight"
-            color="fg"
-            lineHeight="1.05"
-          >
-            Započni svoj
-            <br />
-            rokovnik
-          </Heading>
           <Text mt={3} fontSize="sm" color="fg.muted">
             Već imaš račun?{" "}
             <Box

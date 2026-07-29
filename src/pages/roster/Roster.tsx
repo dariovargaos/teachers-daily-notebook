@@ -159,10 +159,6 @@ export default function Roster() {
               >
                 Moji učenici
               </Text>
-              <Text mt={2} fontSize="sm" color="muted.contrast">
-                {roster.length} {roster.length === 1 ? "učenik" : "učenika"}{" "}
-                upisano
-              </Text>
             </Box>
           </Flex>
 

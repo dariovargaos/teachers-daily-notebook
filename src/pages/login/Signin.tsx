@@ -222,18 +222,7 @@ export default function Signin() {
           >
             Prijava
           </Text>
-          <Heading
-            as="h2"
-            fontFamily="display"
-            mt={2}
-            fontSize={{ base: "4xl", sm: "5xl" }}
-            fontWeight="normal"
-            letterSpacing="tight"
-            color="fg"
-            lineHeight="1.05"
-          >
-            Lijepo te vidjeti
-          </Heading>
+
           <Text mt={3} fontSize="sm" color="fg.muted">
             Nemaš račun?{" "}
             <Box
