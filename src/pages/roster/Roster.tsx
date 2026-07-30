@@ -321,7 +321,6 @@ export default function Roster() {
                         minW={0}
                         p={0}
                         rounded="lg"
-                        opacity={deletingDocumentId === student.id ? 1 : 0}
                         color="muted.contrast"
                         transition="opacity 0.15s"
                         _hover={{
@@ -344,11 +343,11 @@ export default function Roster() {
           mt={10}
           justify="center"
           fontSize="10px"
-          textTransform="uppercase"
           letterSpacing="0.2em"
           color="muted.contrast/70"
         >
-          <Text>Atelier · Mirni planer za moderne učitelje</Text>
+          <Text>e-Rokovnik</Text>
+          <Text textTransform="uppercase"> · Planer za moderne učitelje</Text>
         </Flex>
       </Container>
     </Box>

@@ -915,7 +915,7 @@ export default function Home() {
           letterSpacing="0.2em"
           color="muted.contrast/70"
         >
-          <Text>e-Planer</Text>
+          <Text>e-Rokovnik</Text>
           <Text textTransform="uppercase"> · Planer za moderne učitelje</Text>
         </Flex>
       </Container>

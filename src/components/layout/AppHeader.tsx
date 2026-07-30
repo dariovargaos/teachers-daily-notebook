@@ -67,15 +67,7 @@ export default function AppHeader({ teacherFirstName, year }: Props) {
             letterSpacing="0.18em"
             color="fg"
           >
-            Atelier
-          </Text>
-          <Text
-            fontSize="10px"
-            fontWeight="medium"
-            letterSpacing="0.18em"
-            color="muted.contrast"
-          >
-            EST. {year}
+            e-Rokovnik
           </Text>
         </Box>
       </Flex>
