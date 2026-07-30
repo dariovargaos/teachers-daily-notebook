@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { Box, Button, Flex, Grid, Text } from "@chakra-ui/react";
 import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
-const WEEKDAY_LABELS = ["Ne", "Po", "Ut", "Sr", "Če", "Pe", "Su"];
+const WEEKDAY_LABELS = ["Po", "Ut", "Sr", "Če", "Pe", "Su", "Ne"];
 
 interface CalendarProps {
   selected: Date;
@@ -44,7 +44,7 @@ export default function Calendar({
   const days = useMemo(() => {
     const y = viewMonth.getFullYear();
     const m = viewMonth.getMonth();
-    const firstDay = new Date(y, m, 1).getDay();
+    const firstDay = (new Date(y, m, 1).getDay() + 6) % 7; // Monday = 0
     const daysInMonth = new Date(y, m + 1, 0).getDate();
     const cells: (Date | null)[] = [];
 

@@ -16,10 +16,9 @@ import { useLogout } from "@/hooks/useLogout";
 
 interface Props {
   teacherFirstName: string;
-  year: number;
 }
 
-export default function AppHeader({ teacherFirstName, year }: Props) {
+export default function Navbar({ teacherFirstName }: Props) {
   const { logout, isPending } = useLogout();
   const navigate = useNavigate();
   const location = useLocation();

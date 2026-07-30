@@ -1,12 +1,8 @@
-import { useState, useCallback, useEffect } from "react";
-import { Box, Button, Container, Flex, Input, Text } from "@chakra-ui/react";
+import { useState, useCallback } from "react";
+import { Box, Button, Flex, Input, Text } from "@chakra-ui/react";
 import { LuPlus, LuTrash2 } from "react-icons/lu";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/firebase/config";
-import { useAuthContext } from "@/hooks/useAuthContext";
 import { useCollection } from "@/hooks/useCollection";
 import { useFirestore } from "@/hooks/useFirestore";
-import AppHeader from "@/components/layout/AppHeader";
 
 // ═══════════════════════════════════════════════════════════════
 // Types
@@ -72,22 +68,6 @@ const sharedInputProps = {
 // ═══════════════════════════════════════════════════════════════
 
 export default function Roster() {
-  const { user } = useAuthContext();
-  const [teacherFirstName, setTeacherFirstName] = useState("");
-  const year = new Date().getFullYear();
-
-  useEffect(() => {
-    if (!user) return;
-    const fetchName = async () => {
-      const snap = await getDoc(doc(db, "users", user.uid));
-      if (snap.exists()) {
-        const data = snap.data();
-        setTeacherFirstName(data.firstName ?? "");
-      }
-    };
-    fetchName();
-  }, [user]);
-
   const { data: roster = [], isLoading: rosterLoading } =
     useCollection<Student>("students");
   const { addDocument, deleteDocument, isAddingDocument, deletingDocumentId } =
@@ -121,235 +101,210 @@ export default function Roster() {
   };
 
   return (
-    <Box
-      as="main"
-      minH="100dvh"
-      py={{ base: 6, sm: 10 }}
-      px={{ base: 4, sm: 8 }}
-    >
-      <Container maxW="5xl" p={0}>
-        <AppHeader teacherFirstName={teacherFirstName} year={year} />
-
-        <Shell>
-          {/* Title row */}
-          <Flex
-            align="end"
-            justify="space-between"
-            gap={4}
-            pb={6}
-            borderBottomWidth="1px"
-            borderColor="border"
+    <Shell>
+      {/* Title row */}
+      <Flex
+        align="end"
+        justify="space-between"
+        gap={4}
+        pb={6}
+        borderBottomWidth="1px"
+        borderColor="border"
+      >
+        <Box>
+          <Text
+            fontSize="xs"
+            textTransform="uppercase"
+            letterSpacing="0.2em"
+            color="muted.contrast"
           >
-            <Box>
-              <Text
-                fontSize="xs"
-                textTransform="uppercase"
-                letterSpacing="0.2em"
-                color="muted.contrast"
-              >
-                Razredni popis
-              </Text>
-              <Text
-                textStyle="display"
-                mt={2}
-                fontSize={{ base: "4xl", sm: "5xl" }}
-                fontWeight="semibold"
-                letterSpacing="tight"
-                color="fg"
-              >
-                Moji učenici
-              </Text>
-            </Box>
-          </Flex>
+            Razredni popis
+          </Text>
+          <Text
+            textStyle="display"
+            mt={2}
+            fontSize={{ base: "4xl", sm: "5xl" }}
+            fontWeight="semibold"
+            letterSpacing="tight"
+            color="fg"
+          >
+            Moji učenici
+          </Text>
+        </Box>
+      </Flex>
 
-          {/* Add student row */}
-          <Box mt={6}>
-            <Flex
-              direction={{ base: "column", sm: "row" }}
-              align={{ base: "stretch", sm: "end" }}
-              gap={3}
-            >
-              <Box flex={1}>
-                <Text
-                  as="label"
-                  display="block"
-                  fontSize="10px"
-                  textTransform="uppercase"
-                  letterSpacing="wider"
-                  color="muted.contrast"
-                  mb={1.5}
-                >
-                  Prezime
-                </Text>
-                <Input
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  {...sharedInputProps}
-                />
-              </Box>
-              <Box flex={1}>
-                <Text
-                  as="label"
-                  display="block"
-                  fontSize="10px"
-                  textTransform="uppercase"
-                  letterSpacing="wider"
-                  color="muted.contrast"
-                  mb={1.5}
-                >
-                  Ime
-                </Text>
-                <Input
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  {...sharedInputProps}
-                />
-              </Box>
-
-              <Button
-                onClick={addStudent}
-                loading={isAddingDocument}
-                rounded="xl"
-                bg="primary.solid"
-                color="primary.contrast"
-                px={5}
-                py={2.5}
-                fontSize="sm"
-                fontWeight="medium"
-                boxShadow="sm"
-                _hover={{ opacity: 0.9 }}
-                _active={{ transform: "scale(0.98)" }}
-                transition="all 0.15s"
-              >
-                <LuPlus style={{ marginRight: "0.375rem" }} />
-                Dodaj
-              </Button>
-            </Flex>
-          </Box>
-
-          {/* Student list */}
-          <Box mt={8}>
-            {(() => {
-              const sortedRoster = [...roster].sort((a, b) => {
-                const last = a.lastName.localeCompare(b.lastName);
-                return last !== 0
-                  ? last
-                  : a.firstName.localeCompare(b.firstName);
-              });
-              return rosterLoading ? (
-                <Box
-                  rounded="2xl"
-                  borderWidth="1px"
-                  borderColor="border"
-                  bg="secondary.solid/30"
-                  py={16}
-                  textAlign="center"
-                  fontSize="sm"
-                  color="muted.contrast"
-                >
-                  Učitavanje učenika…
-                </Box>
-              ) : sortedRoster.length === 0 ? (
-                <Box
-                  rounded="2xl"
-                  borderWidth="1px"
-                  borderStyle="dashed"
-                  borderColor="border"
-                  bg="secondary.solid/30"
-                  py={16}
-                  textAlign="center"
-                  fontSize="sm"
-                  color="muted.contrast"
-                >
-                  Još nema učenika. Dodaj prvog učenika iznad.
-                </Box>
-              ) : (
-                <Box
-                  as="ul"
-                  listStyleType="none"
-                  m={0}
-                  p={0}
-                  rounded="2xl"
-                  borderWidth="1px"
-                  borderColor="border"
-                  overflow="hidden"
-                >
-                  {sortedRoster.map((student, index) => (
-                    <Box
-                      key={student.id}
-                      as="li"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="space-between"
-                      gap={3}
-                      px={5}
-                      py={3.5}
-                      bg="secondary.solid/40"
-                      borderBottomWidth={
-                        index < sortedRoster.length - 1 ? "1px" : 0
-                      }
-                      borderColor="border"
-                      transition="background 0.15s"
-                      _hover={{
-                        bg: "secondary.solid/50",
-                        "& .delete-btn": { opacity: 1 },
-                      }}
-                    >
-                      <Flex align="center" gap={3} minW={0}>
-                        <Box minW={0}>
-                          <Text
-                            truncate
-                            fontSize="sm"
-                            fontWeight="medium"
-                            color="fg"
-                          >
-                            {index + 1}. {student.lastName} {student.firstName}
-                          </Text>
-                        </Box>
-                      </Flex>
-                      <Button
-                        onClick={() => removeStudent(student.id)}
-                        aria-label={`Ukloni ${student.lastName} ${student.firstName}`}
-                        className="delete-btn"
-                        loading={deletingDocumentId === student.id}
-                        disabled={deletingDocumentId !== null}
-                        variant="ghost"
-                        h={8}
-                        w={8}
-                        minW={0}
-                        p={0}
-                        rounded="lg"
-                        color="muted.contrast"
-                        transition="opacity 0.15s"
-                        _hover={{
-                          bg: "destructive.solid/10",
-                          color: "destructive.fg",
-                        }}
-                      >
-                        <LuTrash2 />
-                      </Button>
-                    </Box>
-                  ))}
-                </Box>
-              );
-            })()}
-          </Box>
-        </Shell>
-
+      {/* Add student row */}
+      <Box mt={6}>
         <Flex
-          as="footer"
-          mt={10}
-          justify="center"
-          fontSize="10px"
-          letterSpacing="0.2em"
-          color="muted.contrast/70"
+          direction={{ base: "column", sm: "row" }}
+          align={{ base: "stretch", sm: "end" }}
+          gap={3}
         >
-          <Text>e-Rokovnik</Text>
-          <Text textTransform="uppercase"> · Planer za moderne učitelje</Text>
+          <Box flex={1}>
+            <Text
+              as="label"
+              display="block"
+              fontSize="10px"
+              textTransform="uppercase"
+              letterSpacing="wider"
+              color="muted.contrast"
+              mb={1.5}
+            >
+              Prezime
+            </Text>
+            <Input
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              onKeyDown={handleKeyDown}
+              {...sharedInputProps}
+            />
+          </Box>
+          <Box flex={1}>
+            <Text
+              as="label"
+              display="block"
+              fontSize="10px"
+              textTransform="uppercase"
+              letterSpacing="wider"
+              color="muted.contrast"
+              mb={1.5}
+            >
+              Ime
+            </Text>
+            <Input
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              onKeyDown={handleKeyDown}
+              {...sharedInputProps}
+            />
+          </Box>
+
+          <Button
+            onClick={addStudent}
+            loading={isAddingDocument}
+            rounded="xl"
+            bg="primary.solid"
+            color="primary.contrast"
+            px={5}
+            py={2.5}
+            fontSize="sm"
+            fontWeight="medium"
+            boxShadow="sm"
+            _hover={{ opacity: 0.9 }}
+            _active={{ transform: "scale(0.98)" }}
+            transition="all 0.15s"
+          >
+            <LuPlus style={{ marginRight: "0.375rem" }} />
+            Dodaj
+          </Button>
         </Flex>
-      </Container>
-    </Box>
+      </Box>
+
+      {/* Student list */}
+      <Box mt={8}>
+        {(() => {
+          const sortedRoster = [...roster].sort((a, b) => {
+            const last = a.lastName.localeCompare(b.lastName);
+            return last !== 0 ? last : a.firstName.localeCompare(b.firstName);
+          });
+          return rosterLoading ? (
+            <Box
+              rounded="2xl"
+              borderWidth="1px"
+              borderColor="border"
+              bg="secondary.solid/30"
+              py={16}
+              textAlign="center"
+              fontSize="sm"
+              color="muted.contrast"
+            >
+              Učitavanje učenika…
+            </Box>
+          ) : sortedRoster.length === 0 ? (
+            <Box
+              rounded="2xl"
+              borderWidth="1px"
+              borderStyle="dashed"
+              borderColor="border"
+              bg="secondary.solid/30"
+              py={16}
+              textAlign="center"
+              fontSize="sm"
+              color="muted.contrast"
+            >
+              Još nema učenika. Dodaj prvog učenika iznad.
+            </Box>
+          ) : (
+            <Box
+              as="ul"
+              listStyleType="none"
+              m={0}
+              p={0}
+              rounded="2xl"
+              borderWidth="1px"
+              borderColor="border"
+              overflow="hidden"
+            >
+              {sortedRoster.map((student, index) => (
+                <Box
+                  key={student.id}
+                  as="li"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  gap={3}
+                  px={5}
+                  py={3.5}
+                  bg="secondary.solid/40"
+                  borderBottomWidth={
+                    index < sortedRoster.length - 1 ? "1px" : 0
+                  }
+                  borderColor="border"
+                  transition="background 0.15s"
+                  _hover={{
+                    bg: "secondary.solid/50",
+                    "& .delete-btn": { opacity: 1 },
+                  }}
+                >
+                  <Flex align="center" gap={3} minW={0}>
+                    <Box minW={0}>
+                      <Text
+                        truncate
+                        fontSize="sm"
+                        fontWeight="medium"
+                        color="fg"
+                      >
+                        {index + 1}. {student.lastName} {student.firstName}
+                      </Text>
+                    </Box>
+                  </Flex>
+                  <Button
+                    onClick={() => removeStudent(student.id)}
+                    aria-label={`Ukloni ${student.lastName} ${student.firstName}`}
+                    className="delete-btn"
+                    loading={deletingDocumentId === student.id}
+                    disabled={deletingDocumentId !== null}
+                    variant="ghost"
+                    h={8}
+                    w={8}
+                    minW={0}
+                    p={0}
+                    rounded="lg"
+                    color="muted.contrast"
+                    transition="opacity 0.15s"
+                    _hover={{
+                      bg: "destructive.solid/10",
+                      color: "destructive.fg",
+                    }}
+                  >
+                    <LuTrash2 />
+                  </Button>
+                </Box>
+              ))}
+            </Box>
+          );
+        })()}
+      </Box>
+    </Shell>
   );
 }
