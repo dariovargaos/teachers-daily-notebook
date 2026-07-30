@@ -32,5 +32,13 @@ service cloud.firestore {
       allow create: if request.auth != null
                    && request.resource.data.uid == request.auth.uid;
     }
+
+    // Activities: only the teacher who owns the record can access it
+    match /activities/{activityId} {
+      allow read, update, delete: if request.auth != null
+                                  && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null
+                   && request.resource.data.uid == request.auth.uid;
+    }
   }
 }

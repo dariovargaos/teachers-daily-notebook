@@ -25,6 +25,7 @@ export default function Navbar({ teacherFirstName }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const isPlanner = location.pathname === "/";
   const isRoster = location.pathname === "/roster";
+  const isActivities = location.pathname === "/activities";
 
   return (
     <Flex
@@ -112,6 +113,22 @@ export default function Navbar({ teacherFirstName }: Props) {
           transition="all 0.15s"
         >
           Razred
+        </Button>
+        <Button
+          onClick={() => navigate("/activities")}
+          variant="plain"
+          rounded="full"
+          px={4}
+          py={1.5}
+          fontSize="xs"
+          fontWeight="semibold"
+          bg={isActivities ? "card.solid" : "transparent"}
+          color={isActivities ? "fg" : "muted.contrast/70"}
+          boxShadow={isActivities ? "sm" : undefined}
+          _hover={{ color: "fg" }}
+          transition="all 0.15s"
+        >
+          Aktivnosti
         </Button>
 
         <Button
@@ -206,6 +223,22 @@ export default function Navbar({ teacherFirstName }: Props) {
                       _hover={{ color: "fg", bg: "secondary.solid/40" }}
                     >
                       Razred
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        navigate("/activities");
+                        setMenuOpen(false);
+                      }}
+                      variant="ghost"
+                      justifyContent="flex-start"
+                      rounded="lg"
+                      fontWeight="semibold"
+                      fontSize="sm"
+                      bg={isActivities ? "secondary.solid/60" : "transparent"}
+                      color={isActivities ? "fg" : "muted.contrast"}
+                      _hover={{ color: "fg", bg: "secondary.solid/40" }}
+                    >
+                      Aktivnosti
                     </Button>
                   </VStack>
                 </Drawer.Body>
