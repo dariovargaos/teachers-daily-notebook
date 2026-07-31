@@ -14,7 +14,7 @@ export const useLogin = () => {
       // signInWithEmailAndPassword triggers onAuthStateChanged in AuthContext
       // — no manual dispatch needed
       await signInWithEmailAndPassword(auth, email, password);
-
+      localStorage.setItem("tdn_session_start", Date.now().toString());
       setIsPending(false);
     } catch (err) {
       const code = (err as { code?: string }).code;

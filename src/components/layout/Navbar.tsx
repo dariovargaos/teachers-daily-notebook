@@ -8,6 +8,7 @@ import {
   Drawer,
   Flex,
   IconButton,
+  Input,
   Portal,
   Separator,
   Text,
@@ -25,6 +26,9 @@ export default function Navbar({ teacherFirstName }: Props) {
   const { logout, isPending } = useLogout();
   const {
     deleteAccount,
+    reauthAndDelete,
+    resetState: resetDeleteState,
+    needsReauth,
     isPending: deleteIsPending,
     error: deleteError,
   } = useDeleteAccount();
@@ -32,6 +36,7 @@ export default function Navbar({ teacherFirstName }: Props) {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
   const isPlanner = location.pathname === "/";
   const isRoster = location.pathname === "/roster";
   const isActivities = location.pathname === "/activities";
@@ -309,7 +314,13 @@ export default function Navbar({ teacherFirstName }: Props) {
       {/* Delete account confirmation dialog */}
       <Dialog.Root
         open={deleteOpen}
-        onOpenChange={(e) => setDeleteOpen(e.open)}
+        onOpenChange={(e) => {
+          setDeleteOpen(e.open);
+          if (!e.open) {
+            resetDeleteState();
+            setDeletePassword("");
+          }
+        }}
         placement="center"
       >
         <Portal>
@@ -326,6 +337,20 @@ export default function Navbar({ teacherFirstName }: Props) {
                   Ova radnja je trajna. Svi tvoji podaci — bilješke,
                   podsjetnici, razred i aktivnosti — bit će nepovratno obrisani.
                 </Text>
+                {needsReauth && (
+                  <Input
+                    type="password"
+                    placeholder="Unesi lozinku za potvrdu…"
+                    value={deletePassword}
+                    onChange={(e) => setDeletePassword(e.target.value)}
+                    mt={3}
+                    size="sm"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && deletePassword)
+                        reauthAndDelete(deletePassword);
+                    }}
+                  />
+                )}
                 {deleteError && (
                   <Text fontSize="sm" color="red.500" mt={3}>
                     {deleteError}
@@ -344,7 +369,12 @@ export default function Navbar({ teacherFirstName }: Props) {
                   colorPalette="red"
                   size="sm"
                   loading={deleteIsPending}
-                  onClick={deleteAccount}
+                  onClick={
+                    needsReauth
+                      ? () => reauthAndDelete(deletePassword)
+                      : deleteAccount
+                  }
+                  disabled={needsReauth && !deletePassword}
                 >
                   Trajno obriši
                 </Button>

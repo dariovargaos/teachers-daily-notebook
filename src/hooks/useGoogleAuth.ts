@@ -29,6 +29,7 @@ export const useGoogleAuth = () => {
         });
       }
 
+      localStorage.setItem("tdn_session_start", Date.now().toString());
       setIsPending(false);
     } catch (err) {
       const code = (err as { code?: string }).code;
