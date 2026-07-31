@@ -131,6 +131,7 @@ export const useFirestore = (collectionName: string) => {
     deleteDocument,
     updateDocument,
     isAddingDocument: addDocumentMutation.isPending,
+    isUpdatingDocument: updateDocumentMutation.isPending,
     deletingDocumentId: deleteDocumentMutation.isPending
       ? (deleteDocumentMutation.variables?.id ?? null)
       : null,
