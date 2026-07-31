@@ -15,18 +15,13 @@ import {
   GoogleAuthProvider,
 } from "firebase/auth";
 import { db } from "../firebase/config";
+import { USER_OWNED_COLLECTIONS } from "../firebase/collections";
 import { useAuthContext } from "./useAuthContext";
 
-const USER_COLLECTIONS = [
-  "plannerNotes",
-  "reminders",
-  "students",
-  "activities",
-];
 const GOOGLE_PROVIDER = new GoogleAuthProvider();
 
 async function wipeUserData(uid: string) {
-  for (const col of USER_COLLECTIONS) {
+  for (const col of USER_OWNED_COLLECTIONS) {
     const snap = await getDocs(
       query(collection(db, col), where("uid", "==", uid)),
     );

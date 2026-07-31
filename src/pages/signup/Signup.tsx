@@ -16,6 +16,7 @@ import {
   HStack,
   VStack,
   Checkbox,
+  Icon,
 } from "@chakra-ui/react";
 import {
   LuNotebookPen,
@@ -84,28 +85,33 @@ export default function Signup() {
           boxShadow="0 30px 70px -40px oklch(0.3 0.06 60 / 0.35)"
         >
           {/* Mobile logo */}
-          <HStack gap={3} mb={8} display={{ lg: "none" }}>
-            <Flex
-              h={10}
-              w={10}
-              align="center"
-              justify="center"
-              borderRadius="xl"
+          <Flex
+            w="full"
+            display={{ base: "flex", md: "none" }}
+            align="center"
+            gap={3}
+            mb={6}
+          >
+            <Icon
               bg="primary.solid"
+              borderRadius="xl"
+              p={2}
+              boxSize={10}
               color="primary.contrast"
+              boxShadow="0 10px 30px -10px oklch(0.2 0.05 50 / 0.6)"
             >
               <LuNotebookPen size="1.125rem" />
-            </Flex>
+            </Icon>
+
             <Text
               fontFamily="display"
               fontSize="sm"
               fontWeight="semibold"
-              textTransform="uppercase"
               letterSpacing="0.18em"
             >
-              Atelier
+              e-Rokovnik
             </Text>
-          </HStack>
+          </Flex>
 
           <Text
             fontSize="10px"
@@ -275,7 +281,7 @@ export default function Signup() {
                   color="fg"
                   _hover={{ opacity: 0.8 }}
                 >
-                  Uvjete
+                  Uvjete korištenja
                 </Link>{" "}
                 i{" "}
                 <Link
@@ -391,13 +397,9 @@ export default function Signup() {
                   fontFamily="display"
                   fontSize="sm"
                   fontWeight="semibold"
-                  textTransform="uppercase"
                   letterSpacing="0.18em"
                 >
-                  Atelier
-                </Text>
-                <Text fontSize="10px" letterSpacing="0.18em" opacity={0.7}>
-                  EST. {new Date().getFullYear()}
+                  e-Rokovnik
                 </Text>
               </Box>
             </HStack>
@@ -423,7 +425,7 @@ export default function Signup() {
               lineHeight="1.05"
               letterSpacing="tight"
             >
-              Planer koji
+              Rokovnik koji
               <br />
               ne smeta.
             </Heading>
