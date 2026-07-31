@@ -27,14 +27,15 @@ import Calendar from "@/components/calendar/Calendar";
 // Helpers
 // ═══════════════════════════════════════════════════════════════
 
+// Order matches Date.getDay(): 0=Sunday, 1=Monday, …, 6=Saturday
 const WEEKDAYS = [
+  "Nedjelja",
   "Ponedjeljak",
   "Utorak",
   "Srijeda",
   "Četvrtak",
   "Petak",
   "Subota",
-  "Nedjelja",
 ];
 const MONTHS = [
   "Siječanj",
