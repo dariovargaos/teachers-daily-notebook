@@ -314,13 +314,8 @@ export default function Signin() {
               />
             </Field>
 
-            {/* Remember me & Forgot password */}
-            <HStack justify="space-between" fontSize="xs">
-              <Checkbox.Root colorPalette="primary" variant="subtle">
-                <Checkbox.HiddenInput />
-                <Checkbox.Control />
-                <Checkbox.Label color="fg.muted">Zapamti me</Checkbox.Label>
-              </Checkbox.Root>
+            {/* Forgot password */}
+            <HStack justify="flex-end" fontSize="xs">
               <Link
                 href="#"
                 fontWeight="semibold"
@@ -381,18 +376,19 @@ export default function Signin() {
               <GoogleIcon />
               Nastavi s Googleom
             </Button>
-          </VStack>
 
-          <Text
-            mt={8}
-            fontSize="10px"
-            textTransform="uppercase"
-            letterSpacing="0.2em"
-            color="fg.muted/60"
-            textAlign="center"
-          >
-            Prijavom prihvaćaš uvjete korištenja
-          </Text>
+            <Text fontSize="10px" color="fg.muted/60" textAlign="center">
+              Nastavkom s Googleom prihvaćaš{" "}
+              <Link href="#" fontWeight="medium" color="fg.muted">
+                Uvjete korištenja
+              </Link>{" "}
+              i{" "}
+              <Link href="#" fontWeight="medium" color="fg.muted">
+                Pravila privatnosti
+              </Link>
+              .
+            </Text>
+          </VStack>
         </Box>
       </Grid>
     </Flex>

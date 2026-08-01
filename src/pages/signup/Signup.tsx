@@ -35,6 +35,8 @@ export default function Signup() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsError, setTermsError] = useState(false);
 
   const { signup, error, isPending } = useSignup();
   const {
@@ -54,6 +56,11 @@ export default function Signup() {
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
+    if (!termsAccepted) {
+      setTermsError(true);
+      return;
+    }
+    setTermsError(false);
     signup(email, password, firstName.trim(), lastName.trim());
   };
 
@@ -270,31 +277,47 @@ export default function Signup() {
             </HStack>
 
             {/* Terms checkbox */}
-            <Checkbox.Root colorPalette="primary" variant="subtle" required>
-              <Checkbox.HiddenInput />
-              <Checkbox.Control />
-              <Checkbox.Label fontSize="xs" color="fg.muted">
-                Prihvaćam{" "}
-                <Link
-                  href="#"
-                  fontWeight="semibold"
-                  color="fg"
-                  _hover={{ opacity: 0.8 }}
-                >
-                  Uvjete korištenja
-                </Link>{" "}
-                i{" "}
-                <Link
-                  href="#"
-                  fontWeight="semibold"
-                  color="fg"
-                  _hover={{ opacity: 0.8 }}
-                >
-                  Pravila privatnosti
-                </Link>
-                .
-              </Checkbox.Label>
-            </Checkbox.Root>
+            {/* Terms checkbox */}
+            <Box>
+              <Checkbox.Root
+                colorPalette="primary"
+                variant="subtle"
+                checked={termsAccepted}
+                onCheckedChange={(e) => {
+                  setTermsAccepted(!!e.checked);
+                  if (e.checked) setTermsError(false);
+                }}
+              >
+                <Checkbox.HiddenInput />
+                <Checkbox.Control />
+                <Checkbox.Label fontSize="xs" color="fg.muted">
+                  Prihvaćam{" "}
+                  <Link
+                    href="#"
+                    fontWeight="semibold"
+                    color="fg"
+                    _hover={{ opacity: 0.8 }}
+                  >
+                    Uvjete korištenja
+                  </Link>{" "}
+                  i{" "}
+                  <Link
+                    href="#"
+                    fontWeight="semibold"
+                    color="fg"
+                    _hover={{ opacity: 0.8 }}
+                  >
+                    Pravila privatnosti
+                  </Link>
+                  .
+                </Checkbox.Label>
+              </Checkbox.Root>
+              {termsError && (
+                <Text fontSize="xs" color="red.500" mt={1} ml={1}>
+                  Morate prihvatiti Uvjete korištenja za nastavak.
+                </Text>
+              )}
+            </Box>
 
             {/* Submit button */}
             <Button
@@ -346,6 +369,18 @@ export default function Signup() {
               <GoogleIcon />
               Continue with Google
             </Button>
+
+            <Text fontSize="10px" color="fg.muted/60" textAlign="center">
+              Nastavkom s Googleom prihvaćaš{" "}
+              <Link href="#" fontWeight="medium" color="fg.muted">
+                Uvjete korištenja
+              </Link>{" "}
+              i{" "}
+              <Link href="#" fontWeight="medium" color="fg.muted">
+                Pravila privatnosti
+              </Link>
+              .
+            </Text>
           </VStack>
         </Box>
 
