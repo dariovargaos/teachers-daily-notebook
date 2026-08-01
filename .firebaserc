@@ -2,6 +2,14 @@
   "projects": {
     "default": "skolski-rokovnik"
   },
-  "targets": {},
+  "targets": {
+    "skolski-rokovnik": {
+      "hosting": {
+        "auth": [
+          "skolski-rokovnik"
+        ]
+      }
+    }
+  },
   "etags": {}
 }

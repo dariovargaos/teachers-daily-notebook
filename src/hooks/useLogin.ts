@@ -26,6 +26,11 @@ export const useLogin = () => {
         case "auth/invalid-login-credentials":
           setError("Netočan email ili lozinka.");
           break;
+        case "auth/weak-password":
+          setError(
+            "Tvoja lozinka više ne zadovoljava sigurnosne uvjete. Moraš postaviti novu lozinku.",
+          );
+          break;
         default:
           setError((err as Error).message);
       }

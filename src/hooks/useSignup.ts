@@ -49,7 +49,10 @@ export const useSignup = () => {
           setError("Moraš unijeti lozinku.");
           break;
         case "auth/weak-password":
-          setError("Lozinka mora imati najmanje 6 znakova.");
+        case "auth/password-does-not-meet-requirements":
+          setError(
+            "Lozinka mora imati najmanje 8 znakova, jedno veliko, jedno malo slovo i broj.",
+          );
           break;
         case "permission-denied":
           setError("Nije moguće spremiti profil. Pokušaj ponovno.");

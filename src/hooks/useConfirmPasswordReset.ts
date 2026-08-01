@@ -47,7 +47,10 @@ export const useConfirmPasswordReset = () => {
       const code = (err as { code?: string }).code;
       switch (code) {
         case "auth/weak-password":
-          setError("Lozinka mora imati najmanje 6 znakova.");
+        case "auth/password-does-not-meet-requirements":
+          setError(
+            "Lozinka mora imati najmanje 8 znakova, jedno veliko, jedno malo slovo i broj.",
+          );
           break;
         case "auth/expired-action-code":
           setError("Poveznica je istekla. Zatraži novu.");

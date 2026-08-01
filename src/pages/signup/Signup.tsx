@@ -153,13 +153,6 @@ export default function Signup() {
             align="stretch"
             onSubmit={handleSubmit}
           >
-            {/* Error message */}
-            {(error || googleError) && (
-              <Text color="red.500" fontSize="sm" fontWeight="medium">
-                {error || googleError}
-              </Text>
-            )}
-
             {/* First name field */}
             <Field label="Ime" icon={<LuUser />}>
               <Input
@@ -277,7 +270,13 @@ export default function Signup() {
               )}
             </HStack>
 
-            {/* Terms checkbox */}
+            {/* Error message */}
+            {(error || googleError) && (
+              <Text color="red.500" fontSize="sm" fontWeight="medium">
+                {error || googleError}
+              </Text>
+            )}
+
             {/* Terms checkbox */}
             <Box>
               <Checkbox.Root
