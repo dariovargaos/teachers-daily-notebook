@@ -7,6 +7,8 @@ import Roster from "./pages/roster/Roster";
 import ActivitiesLists from "./pages/activities/ActivitiesLists";
 import Signin from "./pages/login/Signin";
 import Signup from "./pages/signup/Signup";
+import ForgotPassword from "./pages/forgot-password/ForgotPassword";
+import ResetPassword from "./pages/reset-password/ResetPassword";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +31,14 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     Component: Signup,
+  },
+  {
+    path: "/forgot-password",
+    Component: ForgotPassword,
+  },
+  {
+    path: "/reset-password",
+    Component: ResetPassword,
   },
 ]);
 

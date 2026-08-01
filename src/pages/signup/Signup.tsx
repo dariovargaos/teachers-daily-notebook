@@ -3,6 +3,7 @@ import { Link as RouterLink, useNavigate } from "react-router";
 import { useSignup } from "../../hooks/useSignup";
 import { useAuthContext } from "../../hooks/useAuthContext";
 import { useGoogleAuth } from "../../hooks/useGoogleAuth";
+import Field from "../../components/field-form/Field";
 import {
   Box,
   Flex,
@@ -511,61 +512,6 @@ export default function Signup() {
         </Flex>
       </Grid>
     </Flex>
-  );
-}
-
-// ── Custom Field wrapper ────────────────────────────
-function Field({
-  label,
-  icon,
-  trailing,
-  children,
-}: {
-  label: string;
-  icon?: React.ReactNode;
-  trailing?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <Box as="label" display="block">
-      <Text
-        as="span"
-        display="block"
-        fontSize="10px"
-        fontWeight="bold"
-        textTransform="uppercase"
-        letterSpacing="0.18em"
-        mb={2}
-        color="gold"
-      >
-        {label}
-      </Text>
-      <HStack
-        gap={3}
-        borderRadius="2xl"
-        borderWidth="1px"
-        borderColor="border"
-        bg="card.solid"
-        px={4}
-        py={3}
-        _focusWithin={{
-          borderColor: "primary.solid/40",
-          outline: "2px solid",
-          outlineColor: "primary.solid/20",
-        }}
-        transition="all"
-      >
-        {icon && (
-          <Box as="span" color="fg.muted" flexShrink={0}>
-            {icon}
-          </Box>
-        )}
-        <Box as="span" flex="1" minW={0}>
-          {children}
-        </Box>
-        {trailing}
-      </HStack>
-    </Box>
   );
 }
 
