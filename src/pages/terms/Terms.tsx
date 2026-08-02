@@ -1,9 +1,9 @@
 import { Link as RouterLink } from "react-router";
 import {
   Box,
+  Button,
   Container,
   Heading,
-  Link,
   List,
   Separator,
   Text,
@@ -170,9 +170,9 @@ export default function Terms() {
 
         {/* Back link */}
         <Box textAlign="center">
-          <Link asChild colorPalette="primary">
+          <Button asChild colorPalette="primary" size="sm" rounded="sm">
             <RouterLink to="/">← Povratak na početnu</RouterLink>
-          </Link>
+          </Button>
         </Box>
       </VStack>
     </Container>

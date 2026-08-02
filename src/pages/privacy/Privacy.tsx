@@ -3,7 +3,7 @@ import {
   Box,
   Container,
   Heading,
-  Link,
+  Button,
   List,
   Separator,
   Table,
@@ -313,9 +313,9 @@ export default function Privacy() {
 
         {/* Back link */}
         <Box textAlign="center">
-          <Link asChild colorPalette="primary">
+          <Button asChild colorPalette="primary" size="sm" rounded="sm">
             <RouterLink to="/">← Povratak na početnu</RouterLink>
-          </Link>
+          </Button>
         </Box>
       </VStack>
     </Container>
