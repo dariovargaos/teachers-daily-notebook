@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link as RouterLink } from "react-router";
 import { useResetPassword } from "../../hooks/useResetPassword";
 import Field from "../../components/field-form/Field";
@@ -19,14 +19,125 @@ import {
   LuCircleCheck,
 } from "react-icons/lu";
 
+const COOLDOWN_SECONDS = 60;
+const MAX_ATTEMPTS_PER_WINDOW = 3;
+const ATTEMPT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const STORAGE_KEY_LAST_ATTEMPT = "forgotPwLastAttempt";
+const STORAGE_KEY_ATTEMPTS = "forgotPwAttempts";
+
+function getRemainingCooldown(): number {
+  const raw = sessionStorage.getItem(STORAGE_KEY_LAST_ATTEMPT);
+  if (!raw) return 0;
+  const elapsed = Date.now() - Number(raw);
+  const remaining = Math.ceil((COOLDOWN_SECONDS * 1000 - elapsed) / 1000);
+  return remaining > 0 ? remaining : 0;
+}
+
+function getRecentAttempts(): number {
+  try {
+    const attempts: number[] = JSON.parse(
+      sessionStorage.getItem(STORAGE_KEY_ATTEMPTS) || "[]",
+    );
+    const windowStart = Date.now() - ATTEMPT_WINDOW_MS;
+    return attempts.filter((t) => t > windowStart).length;
+  } catch {
+    return 0;
+  }
+}
+
+function recordAttempt() {
+  const now = Date.now();
+  sessionStorage.setItem(STORAGE_KEY_LAST_ATTEMPT, String(now));
+  try {
+    const attempts: number[] = JSON.parse(
+      sessionStorage.getItem(STORAGE_KEY_ATTEMPTS) || "[]",
+    );
+    attempts.push(now);
+    // Keep only the last 10 entries to avoid bloat
+    sessionStorage.setItem(
+      STORAGE_KEY_ATTEMPTS,
+      JSON.stringify(attempts.slice(-10)),
+    );
+  } catch {
+    sessionStorage.setItem(STORAGE_KEY_ATTEMPTS, JSON.stringify([now]));
+  }
+}
+
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
+  const [cooldown, setCooldown] = useState(getRemainingCooldown);
+  const [rateLimited, setRateLimited] = useState(
+    () => getRecentAttempts() >= MAX_ATTEMPTS_PER_WINDOW,
+  );
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { resetPassword, error, isPending, isSuccess } = useResetPassword();
 
-  const handleSubmit = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    resetPassword(email);
-  };
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (cooldownRef.current) clearInterval(cooldownRef.current);
+    };
+  }, []);
+
+  // Cooldown countdown effect
+  useEffect(() => {
+    if (cooldown <= 0) {
+      if (cooldownRef.current) {
+        clearInterval(cooldownRef.current);
+        cooldownRef.current = null;
+      }
+      sessionStorage.removeItem(STORAGE_KEY_LAST_ATTEMPT);
+      return;
+    }
+
+    cooldownRef.current = setInterval(() => {
+      setCooldown((prev) => {
+        const next = prev - 1;
+        if (next <= 0) {
+          sessionStorage.removeItem(STORAGE_KEY_LAST_ATTEMPT);
+          return 0;
+        }
+        return next;
+      });
+    }, 1000);
+
+    return () => {
+      if (cooldownRef.current) clearInterval(cooldownRef.current);
+    };
+  }, [cooldown]);
+
+  const handleSubmit = useCallback(
+    (e: React.SyntheticEvent) => {
+      e.preventDefault();
+      if (cooldown > 0) return;
+
+      const recentAttempts = getRecentAttempts();
+      if (recentAttempts >= MAX_ATTEMPTS_PER_WINDOW) {
+        setRateLimited(true);
+        return;
+      }
+
+      recordAttempt();
+      resetPassword(email);
+      setCooldown(COOLDOWN_SECONDS);
+
+      // Check if we just hit the limit
+      if (recentAttempts + 1 >= MAX_ATTEMPTS_PER_WINDOW) {
+        setRateLimited(true);
+      }
+    },
+    [email, cooldown, resetPassword],
+  );
+
+  // Determine why the button is blocked
+  const isBlocked = isPending || cooldown > 0 || rateLimited;
+  const buttonLabel = rateLimited
+    ? "Previše pokušaja. Pričekaj 15 minuta."
+    : isPending
+      ? "Šaljem..."
+      : cooldown > 0
+        ? `Pričekaj ${cooldown}s...`
+        : "Pošalji poveznicu";
 
   return (
     <Flex
@@ -174,7 +285,7 @@ export default function ForgotPassword() {
             <Button
               type="submit"
               loading={isPending}
-              disabled={isPending}
+              disabled={isBlocked}
               colorPalette="primary"
               size="lg"
               borderRadius="2xl"
@@ -186,7 +297,7 @@ export default function ForgotPassword() {
               _active={{ transform: "scale(0.99)" }}
               boxShadow="0 18px 40px -20px oklch(0.2 0.05 50 / 0.6)"
             >
-              {isPending ? "Šaljem..." : "Pošalji poveznicu"}
+              {buttonLabel}
             </Button>
 
             {/* Back to sign in */}
