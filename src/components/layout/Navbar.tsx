@@ -39,7 +39,7 @@ export default function Navbar({ teacherFirstName }: Props) {
   const [deletePassword, setDeletePassword] = useState("");
   const isPlanner = location.pathname === "/";
   const isRoster = location.pathname === "/roster";
-  const isActivities = location.pathname === "/activities";
+  const isRecords = location.pathname === "/records";
 
   return (
     <Flex
@@ -129,20 +129,20 @@ export default function Navbar({ teacherFirstName }: Props) {
             Razred
           </Button>
           <Button
-            onClick={() => navigate("/activities")}
+            onClick={() => navigate("/records")}
             variant="plain"
             rounded="full"
             px={4}
             py={1.5}
             fontSize="xs"
             fontWeight="semibold"
-            bg={isActivities ? "card.solid" : "transparent"}
-            color={isActivities ? "fg" : "muted.contrast/70"}
-            boxShadow={isActivities ? "sm" : undefined}
+            bg={isRecords ? "card.solid" : "transparent"}
+            color={isRecords ? "fg" : "muted.contrast/70"}
+            boxShadow={isRecords ? "sm" : undefined}
             _hover={{ color: "fg" }}
             transition="all 0.15s"
           >
-            Aktivnosti
+            Evidencija
           </Button>
 
           <Button
@@ -256,7 +256,7 @@ export default function Navbar({ teacherFirstName }: Props) {
                     </Button>
                     <Button
                       onClick={() => {
-                        navigate("/activities");
+                        navigate("/records");
                         setMenuOpen(false);
                       }}
                       variant="ghost"
@@ -264,11 +264,11 @@ export default function Navbar({ teacherFirstName }: Props) {
                       rounded="lg"
                       fontWeight="semibold"
                       fontSize="sm"
-                      bg={isActivities ? "secondary.solid/60" : "transparent"}
-                      color={isActivities ? "fg" : "muted.contrast"}
+                      bg={isRecords ? "secondary.solid/60" : "transparent"}
+                      color={isRecords ? "fg" : "muted.contrast"}
                       _hover={{ color: "fg", bg: "secondary.solid/40" }}
                     >
-                      Aktivnosti
+                      Evidencije
                     </Button>
                   </VStack>
                 </Drawer.Body>
@@ -335,7 +335,7 @@ export default function Navbar({ teacherFirstName }: Props) {
               <Dialog.Body>
                 <Text fontSize="sm" color="fg/80">
                   Ova radnja je trajna. Svi tvoji podaci — bilješke,
-                  podsjetnici, razred i aktivnosti — bit će nepovratno obrisani.
+                  podsjetnici, razred i evidencije — bit će nepovratno obrisani.
                 </Text>
                 {needsReauth && (
                   <Input

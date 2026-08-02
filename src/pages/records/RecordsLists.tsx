@@ -14,7 +14,7 @@ import { useFirestore } from "@/hooks/useFirestore";
 // Types
 // ═══════════════════════════════════════════════════════════════
 
-type Activity = {
+type Record = {
   id: string;
   name: string;
   uid: string;
@@ -29,73 +29,62 @@ type Student = {
 };
 
 // ═══════════════════════════════════════════════════════════════
-// ActivitiesLists
+// RecordsLists
 // ═══════════════════════════════════════════════════════════════
 
-export default function ActivitiesLists() {
-  const { data: activities = [] } = useCollection<Activity>("activities");
+export default function RecordsLists() {
+  const { data: records = [] } = useCollection<Record>("records");
   const { data: students = [] } = useCollection<Student>("students");
 
   const {
-    addDocument: addActivity,
-    deleteDocument: deleteActivity,
-    updateDocument: updateActivity,
-  } = useFirestore("activities");
+    addDocument: addRecord,
+    deleteDocument: deleteRecord,
+    updateDocument: updateRecord,
+  } = useFirestore("records");
 
-  const [newActivityName, setNewActivityName] = useState("");
-  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(
-    null,
+  const [newRecordName, setNewRecordName] = useState("");
+  const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
+
+  const selectedRecord = useMemo(
+    () => records.find((a) => a.id === selectedRecordId) ?? null,
+    [records, selectedRecordId],
   );
 
-  const selectedActivity = useMemo(
-    () => activities.find((a) => a.id === selectedActivityId) ?? null,
-    [activities, selectedActivityId],
-  );
-
-  const handleAddActivity = useCallback(async () => {
-    const name = newActivityName.trim();
+  const handleAddRecord = useCallback(async () => {
+    const name = newRecordName.trim();
     if (!name) return;
-    await addActivity({ name, paidStudentIds: [] });
-    setNewActivityName("");
-  }, [newActivityName, addActivity]);
+    await addRecord({ name, paidStudentIds: [] });
+    setNewRecordName("");
+  }, [newRecordName, addRecord]);
 
-  const handleDeleteActivity = useCallback(
+  const handleDeleteRecord = useCallback(
     async (id: string) => {
-      await deleteActivity(id);
-      if (selectedActivityId === id) setSelectedActivityId(null);
+      await deleteRecord(id);
+      if (selectedRecordId === id) setSelectedRecordId(null);
     },
-    [deleteActivity, selectedActivityId],
+    [deleteRecord, selectedRecordId],
   );
 
   const togglePaid = useCallback(
     async (studentId: string) => {
-      if (!selectedActivity) return;
-      const current = selectedActivity.paidStudentIds ?? [];
+      if (!selectedRecord) return;
+      const current = selectedRecord.paidStudentIds ?? [];
       const updated = current.includes(studentId)
         ? current.filter((id) => id !== studentId)
         : [...current, studentId];
-      await updateActivity(selectedActivity.id, { paidStudentIds: updated });
+      await updateRecord(selectedRecord.id, { paidStudentIds: updated });
     },
-    [selectedActivity, updateActivity],
+    [selectedRecord, updateRecord],
   );
 
-  const paidIds = selectedActivity?.paidStudentIds ?? [];
+  const paidIds = selectedRecord?.paidStudentIds ?? [];
   const paidCount = students.filter((s) => paidIds.includes(s.id)).length;
 
   return (
     <>
       {/* Page heading */}
-      <Flex align="end" justify="space-between" gap={4} mb={6} px={1}>
+      <Flex align="end" justify="space-between" gap={4} mb={4} px={1}>
         <Box>
-          <Text
-            fontSize="10px"
-            fontWeight="bold"
-            textTransform="uppercase"
-            letterSpacing="0.22em"
-            color="gold"
-          >
-            Školske aktivnosti
-          </Text>
           <Text
             textStyle="display"
             mt={1}
@@ -105,17 +94,30 @@ export default function ActivitiesLists() {
             color="fg"
             lineHeight="1.05"
           >
-            Aktivnosti
+            Evidencije
           </Text>
         </Box>
       </Flex>
+
+      <Text
+        fontSize="sm"
+        color="fg.muted"
+        maxW="3xl"
+        lineHeight="relaxed"
+        mb={8}
+        px={1}
+      >
+        Evidencija omogućuje praćenje izvršenih obveza učenika kroz
+        prilagodljive popise. Dodajte naziv evidencije i jednostavno označite
+        učenika kada učenik ispuni svoju obvezu.
+      </Text>
 
       <Grid
         templateColumns={{ base: "1fr", lg: "1fr 1fr" }}
         gap={{ base: 6, lg: 8 }}
         alignItems="start"
       >
-        {/* ── Left: activity list ──────────────────────────────── */}
+        {/* ── Left: record list ──────────────────────────────── */}
         <Box minW={0}>
           {/* Card */}
           <Box
@@ -126,7 +128,7 @@ export default function ActivitiesLists() {
             backdropFilter="blur(12px)"
             p={{ base: 6, sm: 8 }}
             boxShadow="0 30px 70px -40px oklch(0.3 0.06 60 / 0.3)"
-            h="65vh"
+            h="55vh"
             display="flex"
             flexDirection="column"
             overflow="hidden"
@@ -141,10 +143,10 @@ export default function ActivitiesLists() {
               color="gold"
               mb={4}
             >
-              Nova aktivnost
+              Nova evidencija
             </Box>
 
-            {/* Add activity row */}
+            {/* Add record row */}
             <Flex
               gap={2}
               mb={6}
@@ -155,8 +157,8 @@ export default function ActivitiesLists() {
               <Input
                 flex={1}
                 placeholder="npr. Fotografiranje razreda…"
-                value={newActivityName}
-                onChange={(e) => setNewActivityName(e.target.value)}
+                value={newRecordName}
+                onChange={(e) => setNewRecordName(e.target.value)}
                 size="sm"
                 rounded="xl"
                 borderColor="border"
@@ -170,11 +172,11 @@ export default function ActivitiesLists() {
                   boxShadow: "0 0 0 2px {colors.primary.solid/30}",
                 }}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleAddActivity();
+                  if (e.key === "Enter") handleAddRecord();
                 }}
               />
               <IconButton
-                aria-label="Dodaj aktivnost"
+                aria-label="Dodaj evidenciju"
                 size="sm"
                 rounded="xl"
                 bg="primary.solid"
@@ -182,16 +184,16 @@ export default function ActivitiesLists() {
                 _hover={{ opacity: 0.85 }}
                 _active={{ transform: "scale(0.95)" }}
                 transition="all 0.15s"
-                onClick={handleAddActivity}
+                onClick={handleAddRecord}
               >
                 <LuPlus />
               </IconButton>
             </Flex>
 
-            {/* Activity list */}
-            {activities.length === 0 ? (
+            {/* Record list */}
+            {records.length === 0 ? (
               <Text fontSize="md" color="fg/30" py={3} fontStyle="italic">
-                Još nema aktivnosti. Dodaj prvu iznad…
+                Još nema evidencija. Dodaj novu evidenciju pomoću polja iznad.
               </Text>
             ) : (
               <Flex
@@ -201,8 +203,8 @@ export default function ActivitiesLists() {
                 overflowY="auto"
                 minH={0}
               >
-                {activities.map((a) => {
-                  const isSelected = a.id === selectedActivityId;
+                {records.map((a) => {
+                  const isSelected = a.id === selectedRecordId;
                   return (
                     <Flex
                       key={a.id}
@@ -226,7 +228,7 @@ export default function ActivitiesLists() {
                       }}
                       transition="all 0.15s"
                       onClick={() =>
-                        setSelectedActivityId(isSelected ? null : a.id)
+                        setSelectedRecordId(isSelected ? null : a.id)
                       }
                       role="button"
                     >
@@ -260,7 +262,7 @@ export default function ActivitiesLists() {
                       </Box>
 
                       <IconButton
-                        aria-label="Obriši aktivnost"
+                        aria-label="Obriši evidenciju"
                         variant="ghost"
                         size="2xs"
                         color="muted.contrast/50"
@@ -269,7 +271,7 @@ export default function ActivitiesLists() {
                         flexShrink={0}
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleDeleteActivity(a.id);
+                          handleDeleteRecord(a.id);
                         }}
                       >
                         <LuTrash2 />
@@ -284,7 +286,7 @@ export default function ActivitiesLists() {
 
         {/* ── Right: student payment roster ───────────────────── */}
         <Box as="aside" position={{ lg: "sticky" }} top={{ lg: 0 }}>
-          {selectedActivity ? (
+          {selectedRecord ? (
             <Box
               rounded="2rem"
               bg="paper/75"
@@ -317,7 +319,7 @@ export default function ActivitiesLists() {
                     textOverflow="ellipsis"
                     whiteSpace="nowrap"
                   >
-                    {selectedActivity.name}
+                    {selectedRecord.name}
                   </Text>
                 </Box>
 
@@ -399,7 +401,7 @@ export default function ActivitiesLists() {
               )}
             </Box>
           ) : (
-            /* Empty state — no activity selected */
+            /* Empty state — no record selected */
             <Box
               rounded="2rem"
               bg="paper/40"
@@ -423,11 +425,10 @@ export default function ActivitiesLists() {
                 <LuUsers size="1.25rem" />
               </Flex>
               <Text fontSize="sm" fontWeight="semibold" color="fg/60" mb={1}>
-                Odaberi aktivnost
+                Odaberi evidenciju
               </Text>
               <Text fontSize="xs" color="muted.contrast/50">
-                Klikni na aktivnost s lijeve strane da vidiš popis učenika i
-                upravljaš uplatama.
+                Klikni na evidenciju s lijeve strane da vidiš popis učenika.
               </Text>
             </Box>
           )}

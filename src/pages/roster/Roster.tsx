@@ -378,7 +378,7 @@ export default function Roster() {
               fontSize="xs"
               textTransform="uppercase"
               letterSpacing="0.2em"
-              color="muted.contrast"
+              color="gold"
             >
               Razredni popis
             </Text>
@@ -505,7 +505,9 @@ export default function Roster() {
                 rounded="2xl"
                 borderWidth="1px"
                 borderColor="border"
-                overflow="hidden"
+                overflowX="hidden"
+                overflowY="auto"
+                maxH="400px"
               >
                 {sortedRoster.map((student, index) => (
                   <Box

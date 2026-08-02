@@ -3,5 +3,5 @@ export const USER_OWNED_COLLECTIONS = [
   "plannerNotes",
   "reminders",
   "students",
-  "activities",
+  "records",
 ] as const;

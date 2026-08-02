@@ -23,12 +23,22 @@ export default function AppLayout() {
     <Box
       as="main"
       minH="100dvh"
+      display="flex"
+      flexDirection="column"
       py={{ base: 6, sm: 10 }}
       px={{ base: 4, sm: 8 }}
     >
-      <Container maxW="5xl" p={0}>
+      <Container
+        maxW="5xl"
+        p={0}
+        display="flex"
+        flexDirection="column"
+        flex={1}
+      >
         <Navbar teacherFirstName={teacherFirstName} />
-        <Outlet />
+        <Box flex={1}>
+          <Outlet />
+        </Box>
         <Footer />
       </Container>
     </Box>
