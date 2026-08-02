@@ -31,7 +31,7 @@ export default function Navbar({ teacherFirstName }: Props) {
     needsReauth,
     isPending: deleteIsPending,
     error: deleteError,
-  } = useDeleteAccount();
+  } = useDeleteAccount(() => navigate("/signin", { replace: true }));
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -372,7 +372,7 @@ export default function Navbar({ teacherFirstName }: Props) {
                       ? () => reauthAndDelete(deletePassword)
                       : deleteAccount
                   }
-                  disabled={needsReauth && !deletePassword}
+                  disabled={deleteIsPending || (needsReauth && !deletePassword)}
                 >
                   Trajno obriši
                 </Button>

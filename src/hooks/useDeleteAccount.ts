@@ -36,7 +36,7 @@ async function wipeUserData(uid: string) {
   await profileBatch.commit();
 }
 
-export const useDeleteAccount = () => {
+export const useDeleteAccount = (onSuccess?: () => void) => {
   const { user } = useAuthContext();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,10 +54,13 @@ export const useDeleteAccount = () => {
     setIsPending(true);
 
     try {
-      // Auth deletion probed first — if session is stale this throws before any data is touched
-      await deleteUser(user);
-      // JWT is still valid for Firestore until it expires; wipe data while we still have it
+      // Wipe Firestore data FIRST while the JWT is still valid.
+      // If deleteUser runs first, the auth token becomes invalid and
+      // Firestore security rules (request.auth != null) reject all deletes.
       await wipeUserData(user.uid);
+      await deleteUser(user);
+      // Everything deleted — signal completion so the UI can navigate away
+      onSuccess?.();
     } catch (err) {
       const code = (err as { code?: string }).code;
       if (code === "auth/requires-recent-login") {
@@ -67,8 +70,10 @@ export const useDeleteAccount = () => {
         if (isGoogle) {
           try {
             await reauthenticateWithPopup(user, GOOGLE_PROVIDER);
-            await deleteUser(user);
+            // Wipe data first, then delete the auth user
             await wipeUserData(user.uid);
+            await deleteUser(user);
+            onSuccess?.();
             return;
           } catch (reauthErr) {
             const rc = (reauthErr as { code?: string }).code;
@@ -98,8 +103,11 @@ export const useDeleteAccount = () => {
     try {
       const credential = EmailAuthProvider.credential(user.email, password);
       await reauthenticateWithCredential(user, credential);
-      await deleteUser(user);
+      // Wipe data first, then delete the auth user
       await wipeUserData(user.uid);
+      await deleteUser(user);
+      // Everything deleted — signal completion so the UI can navigate away
+      onSuccess?.();
     } catch (err) {
       const code = (err as { code?: string }).code;
       if (
