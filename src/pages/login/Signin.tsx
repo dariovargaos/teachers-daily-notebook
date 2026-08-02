@@ -381,12 +381,16 @@ export default function Signin() {
 
             <Text fontSize="10px" color="fg.muted/60" textAlign="center">
               Nastavkom s Googleom prihvaćaš{" "}
-              <Link href="#" fontWeight="medium" color="fg.muted">
-                Uvjete korištenja
+              <Link asChild fontWeight="bold" color="fg.muted">
+                <RouterLink to="/uvjeti-koristenja">
+                  Uvjete korištenja
+                </RouterLink>
               </Link>{" "}
               i{" "}
-              <Link href="#" fontWeight="medium" color="fg.muted">
-                Pravila privatnosti
+              <Link asChild fontWeight="bold" color="fg.muted">
+                <RouterLink to="/politika-privatnosti">
+                  Pravila privatnosti
+                </RouterLink>
               </Link>
               .
             </Text>

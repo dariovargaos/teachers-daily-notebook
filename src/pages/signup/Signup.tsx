@@ -292,22 +292,16 @@ export default function Signup() {
                 <Checkbox.Control />
                 <Checkbox.Label fontSize="xs" color="fg.muted">
                   Prihvaćam{" "}
-                  <Link
-                    href="#"
-                    fontWeight="semibold"
-                    color="fg"
-                    _hover={{ opacity: 0.8 }}
-                  >
-                    Uvjete korištenja
+                  <Link asChild fontWeight="bold" color="fg">
+                    <RouterLink to="/uvjeti-koristenja">
+                      Uvjete korištenja
+                    </RouterLink>
                   </Link>{" "}
                   i{" "}
-                  <Link
-                    href="#"
-                    fontWeight="semibold"
-                    color="fg"
-                    _hover={{ opacity: 0.8 }}
-                  >
-                    Pravila privatnosti
+                  <Link asChild fontWeight="bold" color="fg">
+                    <RouterLink to="/politika-privatnosti">
+                      Pravila privatnosti
+                    </RouterLink>
                   </Link>
                   .
                 </Checkbox.Label>
@@ -372,12 +366,16 @@ export default function Signup() {
 
             <Text fontSize="10px" color="fg.muted/60" textAlign="center">
               Nastavkom s Googleom prihvaćaš{" "}
-              <Link href="#" fontWeight="medium" color="fg.muted">
-                Uvjete korištenja
+              <Link asChild fontWeight="bold" color="fg.muted">
+                <RouterLink to="/uvjeti-koristenja">
+                  Uvjete korištenja
+                </RouterLink>
               </Link>{" "}
               i{" "}
-              <Link href="#" fontWeight="medium" color="fg.muted">
-                Pravila privatnosti
+              <Link asChild fontWeight="bold" color="fg.muted">
+                <RouterLink to="/politika-privatnosti">
+                  Pravila privatnosti
+                </RouterLink>
               </Link>
               .
             </Text>

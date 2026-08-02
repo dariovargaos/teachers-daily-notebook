@@ -11,6 +11,8 @@ import ForgotPassword from "./pages/forgot-password/ForgotPassword";
 import ResetPassword from "./pages/reset-password/ResetPassword";
 import NotFound from "./pages/not-found/NotFound";
 import ErrorPage from "./pages/error/ErrorPage";
+import Terms from "./pages/terms/Terms";
+import Privacy from "./pages/privacy/Privacy";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +49,16 @@ const router = createBrowserRouter([
     path: "/reset-password",
     errorElement: <ErrorPage />,
     Component: ResetPassword,
+  },
+  {
+    path: "/uvjeti-koristenja",
+    errorElement: <ErrorPage />,
+    Component: Terms,
+  },
+  {
+    path: "/politika-privatnosti",
+    errorElement: <ErrorPage />,
+    Component: Privacy,
   },
   {
     path: "*",
