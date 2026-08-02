@@ -25,7 +25,7 @@
       ]
     },
     {
-      "collectionGroup": "activities",
+      "collectionGroup": "records",
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "uid", "order": "ASCENDING" },

@@ -43,6 +43,7 @@ export default function RecordsLists() {
   } = useFirestore("records");
 
   const [newRecordName, setNewRecordName] = useState("");
+  const [newRecordError, setNewRecordError] = useState("");
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
 
   const selectedRecord = useMemo(
@@ -52,9 +53,13 @@ export default function RecordsLists() {
 
   const handleAddRecord = useCallback(async () => {
     const name = newRecordName.trim();
-    if (!name) return;
+    if (!name) {
+      setNewRecordError("Naziv evidencije ne može biti prazan.");
+      return;
+    }
     await addRecord({ name, paidStudentIds: [] });
     setNewRecordName("");
+    setNewRecordError("");
   }, [newRecordName, addRecord]);
 
   const handleDeleteRecord = useCallback(
@@ -148,46 +153,57 @@ export default function RecordsLists() {
 
             {/* Add record row */}
             <Flex
-              gap={2}
-              mb={6}
-              pb={5}
+              flexDirection="column"
               borderBottomWidth="1px"
               borderColor="border/30"
+              mb={6}
             >
-              <Input
-                flex={1}
-                placeholder="npr. Fotografiranje razreda…"
-                value={newRecordName}
-                onChange={(e) => setNewRecordName(e.target.value)}
-                size="sm"
-                rounded="xl"
-                borderColor="border"
-                bg="secondary.solid/50"
-                color="fg"
-                fontSize="sm"
-                _placeholder={{ color: "muted.contrast/60" }}
-                _focusVisible={{
-                  outline: "none",
-                  borderColor: "primary.solid/40",
-                  boxShadow: "0 0 0 2px {colors.primary.solid/30}",
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleAddRecord();
-                }}
-              />
-              <IconButton
-                aria-label="Dodaj evidenciju"
-                size="sm"
-                rounded="xl"
-                bg="primary.solid"
-                color="primary.contrast"
-                _hover={{ opacity: 0.85 }}
-                _active={{ transform: "scale(0.95)" }}
-                transition="all 0.15s"
-                onClick={handleAddRecord}
-              >
-                <LuPlus />
-              </IconButton>
+              <Flex gap={2} pb={5}>
+                <Input
+                  flex={1}
+                  placeholder="npr. Fotografiranje razreda…"
+                  value={newRecordName}
+                  onChange={(e) => {
+                    setNewRecordName(e.target.value);
+                    if (newRecordError) setNewRecordError("");
+                  }}
+                  size="sm"
+                  rounded="xl"
+                  borderColor="border"
+                  bg="secondary.solid/50"
+                  color="fg"
+                  fontSize="sm"
+                  _placeholder={{ color: "muted.contrast/60" }}
+                  _focusVisible={{
+                    outline: "none",
+                    borderColor: "primary.solid/40",
+                    boxShadow: "0 0 0 2px {colors.primary.solid/30}",
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleAddRecord();
+                  }}
+                />
+                <IconButton
+                  aria-label="Dodaj evidenciju"
+                  size="sm"
+                  rounded="xl"
+                  bg="primary.solid"
+                  color="primary.contrast"
+                  _hover={{ opacity: 0.85 }}
+                  _active={{ transform: "scale(0.95)" }}
+                  transition="all 0.15s"
+                  onClick={handleAddRecord}
+                >
+                  <LuPlus />
+                </IconButton>
+              </Flex>
+
+              {/* Validation error */}
+              {newRecordError && (
+                <Text fontSize="xs" color="destructive.fg" mb={4} mt={-3}>
+                  {newRecordError}
+                </Text>
+              )}
             </Flex>
 
             {/* Record list */}
@@ -427,7 +443,18 @@ export default function RecordsLists() {
               <Text fontSize="sm" fontWeight="semibold" color="fg/60" mb={1}>
                 Odaberi evidenciju
               </Text>
-              <Text fontSize="xs" color="muted.contrast/50">
+              <Text
+                fontSize="xs"
+                color="muted.contrast/50"
+                display={{ base: "block", lg: "none" }}
+              >
+                Klikni na evidenciju iznad da vidiš popis učenika.
+              </Text>
+              <Text
+                fontSize="xs"
+                color="muted.contrast/50"
+                display={{ base: "none", lg: "block" }}
+              >
                 Klikni na evidenciju s lijeve strane da vidiš popis učenika.
               </Text>
             </Box>

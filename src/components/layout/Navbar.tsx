@@ -77,7 +77,6 @@ export default function Navbar({ teacherFirstName }: Props) {
             textStyle="display"
             fontSize="sm"
             fontWeight="semibold"
-            letterSpacing="0.18em"
             color="fg"
           >
             e-Rokovnik
@@ -86,7 +85,7 @@ export default function Navbar({ teacherFirstName }: Props) {
       </Flex>
 
       {/* Desktop nav + delete button — hidden on mobile */}
-      <Flex hideBelow="sm" align="center" gap={2}>
+      <Flex hideBelow="md" align="center" gap={2}>
         <Flex
           as="nav"
           align="center"
@@ -181,7 +180,7 @@ export default function Navbar({ teacherFirstName }: Props) {
       </Flex>
 
       {/* Mobile hamburger menu — hidden on desktop */}
-      <Box hideFrom="sm">
+      <Box hideFrom="md">
         <Drawer.Root
           placement="end"
           size="xs"

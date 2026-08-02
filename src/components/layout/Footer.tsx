@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <Flex
       as="footer"
-      flexDirection={{ base: "column", md: "row" }}
+      flexDirection={{ base: "column", lg: "row" }}
       mt={10}
       align="center"
       justify="center"

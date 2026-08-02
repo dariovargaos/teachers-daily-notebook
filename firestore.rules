@@ -40,6 +40,16 @@ service cloud.firestore {
                    && (request.resource.data.address == null || request.resource.data.address is string);
     }
 
+    // Records: only the teacher who owns the record can access it
+    match /records/{recordId} {
+      allow read, update, delete: if request.auth != null
+                                  && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null
+                   && request.resource.data.uid == request.auth.uid
+                   && request.resource.data.name is string
+                   && request.resource.data.name.size() > 0;
+    }
+
     // Reminders: only the teacher who owns the record can access it
     match /reminders/{reminderId} {
       allow read, update, delete: if request.auth != null
@@ -50,14 +60,6 @@ service cloud.firestore {
 
     // Planner notes: only the teacher who owns the record can access it
     match /plannerNotes/{noteId} {
-      allow read, update, delete: if request.auth != null
-                                  && resource.data.uid == request.auth.uid;
-      allow create: if request.auth != null
-                   && request.resource.data.uid == request.auth.uid;
-    }
-
-    // Activities: only the teacher who owns the record can access it
-    match /activities/{activityId} {
       allow read, update, delete: if request.auth != null
                                   && resource.data.uid == request.auth.uid;
       allow create: if request.auth != null
