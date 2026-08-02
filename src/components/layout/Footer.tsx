@@ -52,6 +52,15 @@ export default function Footer() {
             Politika privatnosti
           </RouterLink>
         </Link>
+        <Link
+          asChild
+          color="muted.contrast/70"
+          _hover={{ color: "fg" }}
+          transition="colors"
+          css={{ textDecorationColor: "currentColor" }}
+        >
+          <RouterLink to="/politika-kolacica">Politika kolačića</RouterLink>
+        </Link>
       </Flex>
 
       {/* Copyright row */}

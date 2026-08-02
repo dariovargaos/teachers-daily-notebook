@@ -77,7 +77,6 @@ export default function Navbar({ teacherFirstName }: Props) {
             textStyle="display"
             fontSize="sm"
             fontWeight="semibold"
-            textTransform="uppercase"
             letterSpacing="0.18em"
             color="fg"
           >

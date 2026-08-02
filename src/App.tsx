@@ -13,6 +13,8 @@ import NotFound from "./pages/not-found/NotFound";
 import ErrorPage from "./pages/error/ErrorPage";
 import Terms from "./pages/terms/Terms";
 import Privacy from "./pages/privacy/Privacy";
+import Cookies from "./pages/cookies/Cookies";
+import CookieBanner from "./components/layout/CookieBanner";
 
 const router = createBrowserRouter([
   {
@@ -61,13 +63,23 @@ const router = createBrowserRouter([
     Component: Privacy,
   },
   {
+    path: "/politika-kolacica",
+    errorElement: <ErrorPage />,
+    Component: Cookies,
+  },
+  {
     path: "*",
     Component: NotFound,
   },
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <CookieBanner />
+    </>
+  );
 }
 
 export default App;
