@@ -113,12 +113,7 @@ export default function Signin() {
                 <LuNotebookPen size="1.125rem" />
               </Flex>
               <Box lineHeight="tight">
-                <Text
-                  fontFamily="display"
-                  fontSize="sm"
-                  fontWeight="semibold"
-                  letterSpacing="0.18em"
-                >
+                <Text fontFamily="display" fontSize="md" fontWeight="semibold">
                   e-Rokovnik
                 </Text>
               </Box>
@@ -164,13 +159,11 @@ export default function Signin() {
           {/* Footer */}
           <HStack
             position="relative"
-            justify="space-between"
             fontSize="10px"
             textTransform="uppercase"
             letterSpacing="0.2em"
             opacity={0.6}
           >
-            <Text as="span">God. {new Date().getFullYear()}</Text>
             <Text as="span">Rokovnik za moderne učitelje</Text>
           </HStack>
         </Flex>
@@ -190,7 +183,7 @@ export default function Signin() {
 
           <Flex
             w="full"
-            display={{ base: "flex", md: "none" }}
+            display={{ base: "flex", lg: "none" }}
             align="center"
             gap={3}
             mb={6}
@@ -206,12 +199,7 @@ export default function Signin() {
               <LuNotebookPen size="1.125rem" />
             </Icon>
 
-            <Text
-              fontFamily="display"
-              fontSize="sm"
-              fontWeight="semibold"
-              letterSpacing="0.18em"
-            >
+            <Text fontFamily="display" fontSize="md" fontWeight="semibold">
               e-Rokovnik
             </Text>
           </Flex>

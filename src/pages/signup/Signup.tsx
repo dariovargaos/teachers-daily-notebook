@@ -95,7 +95,7 @@ export default function Signup() {
           {/* Mobile logo */}
           <Flex
             w="full"
-            display={{ base: "flex", md: "none" }}
+            display={{ base: "flex", lg: "none" }}
             align="center"
             gap={3}
             mb={6}
@@ -111,12 +111,7 @@ export default function Signup() {
               <LuNotebookPen size="1.125rem" />
             </Icon>
 
-            <Text
-              fontFamily="display"
-              fontSize="sm"
-              fontWeight="semibold"
-              letterSpacing="0.18em"
-            >
+            <Text fontFamily="display" fontSize="md" fontWeight="semibold">
               e-Rokovnik
             </Text>
           </Flex>
@@ -265,7 +260,8 @@ export default function Signup() {
                   color="fg.muted/40"
                   letterSpacing="0.04em"
                 >
-                  Najmanje 8 znakova
+                  Najmanje 8 znakova (jedno veliko slovo, jedno malo slovo i
+                  jedan broj)
                 </Text>
               )}
             </HStack>
@@ -426,12 +422,7 @@ export default function Signup() {
                 <LuNotebookPen size="1.125rem" />
               </Flex>
               <Box lineHeight="tight">
-                <Text
-                  fontFamily="display"
-                  fontSize="sm"
-                  fontWeight="semibold"
-                  letterSpacing="0.18em"
-                >
+                <Text fontFamily="display" fontSize="md" fontWeight="semibold">
                   e-Rokovnik
                 </Text>
               </Box>
