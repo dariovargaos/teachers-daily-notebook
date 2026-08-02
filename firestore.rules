@@ -9,12 +9,35 @@ service cloud.firestore {
                         && request.auth.uid == userId;
     }
 
-    // Students roster: only the teacher who owns the record can access it
+    // Students roster: only the teacher who owns the record can access it.
+    // firstName and lastName are required, non-empty strings.
     match /students/{studentId} {
-      allow read, update, delete: if request.auth != null
-                                  && resource.data.uid == request.auth.uid;
+      allow read, delete: if request.auth != null
+                         && resource.data.uid == request.auth.uid;
       allow create: if request.auth != null
-                   && request.resource.data.uid == request.auth.uid;
+                   && request.resource.data.uid == request.auth.uid
+                   && request.resource.data.firstName is string
+                   && request.resource.data.firstName.size() > 0
+                   && !request.resource.data.firstName.matches('.*[0-9].*')
+                   && request.resource.data.lastName is string
+                   && request.resource.data.lastName.size() > 0
+                   && !request.resource.data.lastName.matches('.*[0-9].*');
+      allow update: if request.auth != null
+                   && resource.data.uid == request.auth.uid
+                   // student names
+                   && (request.resource.data.firstName == null || (request.resource.data.firstName is string && request.resource.data.firstName.size() > 0 && !request.resource.data.firstName.matches('.*[0-9].*')))
+                   && (request.resource.data.lastName == null || (request.resource.data.lastName is string && request.resource.data.lastName.size() > 0 && !request.resource.data.lastName.matches('.*[0-9].*')))
+                   // parent 1 names — optional, but no digits if provided
+                   && (request.resource.data.parent1FirstName == null || (request.resource.data.parent1FirstName is string && !request.resource.data.parent1FirstName.matches('.*[0-9].*')))
+                   && (request.resource.data.parent1LastName == null || (request.resource.data.parent1LastName is string && !request.resource.data.parent1LastName.matches('.*[0-9].*')))
+                   // parent 2 names — optional, but no digits if provided
+                   && (request.resource.data.parent2FirstName == null || (request.resource.data.parent2FirstName is string && !request.resource.data.parent2FirstName.matches('.*[0-9].*')))
+                   && (request.resource.data.parent2LastName == null || (request.resource.data.parent2LastName is string && !request.resource.data.parent2LastName.matches('.*[0-9].*')))
+                   // parent phones — only digits, spaces, + - ( )
+                   && (request.resource.data.parent1Phone == null || (request.resource.data.parent1Phone is string && request.resource.data.parent1Phone.matches('^[0-9\\s+\\-()]*$')))
+                   && (request.resource.data.parent2Phone == null || (request.resource.data.parent2Phone is string && request.resource.data.parent2Phone.matches('^[0-9\\s+\\-()]*$')))
+                   // address
+                   && (request.resource.data.address == null || request.resource.data.address is string);
     }
 
     // Reminders: only the teacher who owns the record can access it

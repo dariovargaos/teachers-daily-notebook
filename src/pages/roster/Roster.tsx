@@ -33,6 +33,20 @@ type StudentDetails = {
 };
 
 // ═══════════════════════════════════════════════════════════════
+// Input filters (module scope — reused by Roster & Dialog)
+// ═══════════════════════════════════════════════════════════════
+
+/** Unicode letters (includes diacritics), spaces & hyphens only */
+const lettersOnly = (value: string) => value.replace(/[^\p{L}\s-]/gu, "");
+
+/** Digits, spaces, + - ( ) for phone numbers */
+const numbersOnly = (value: string) => value.replace(/[^\d\s+()-]/g, "");
+
+/** Letters, digits, spaces, commas, periods, hyphens, forward slashes — no emoji or special chars */
+const addressSafe = (value: string) =>
+  value.replace(/[^\p{L}\p{N}\s.,\-\/]/gu, "");
+
+// ═══════════════════════════════════════════════════════════════
 // Student details dialog
 // ═══════════════════════════════════════════════════════════════
 
@@ -79,20 +93,21 @@ function StudentDetailsDialog({
   }));
 
   const set =
-    (field: keyof StudentDetails) => (e: React.ChangeEvent<HTMLInputElement>) =>
-      setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    (field: keyof StudentDetails, filter: (v: string) => string = (v) => v) =>
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      setForm((prev) => ({ ...prev, [field]: filter(e.target.value) }));
 
   const handleSave = async () => {
     if (!student) return;
     try {
       await onSave(student.id, {
-        parent1FirstName: form.parent1FirstName.trim(),
-        parent1LastName: form.parent1LastName.trim(),
-        parent1Phone: form.parent1Phone.trim(),
-        parent2FirstName: form.parent2FirstName.trim(),
-        parent2LastName: form.parent2LastName.trim(),
-        parent2Phone: form.parent2Phone.trim(),
-        address: form.address.trim(),
+        parent1FirstName: lettersOnly(form.parent1FirstName.trim()),
+        parent1LastName: lettersOnly(form.parent1LastName.trim()),
+        parent1Phone: numbersOnly(form.parent1Phone.trim()),
+        parent2FirstName: lettersOnly(form.parent2FirstName.trim()),
+        parent2LastName: lettersOnly(form.parent2LastName.trim()),
+        parent2Phone: numbersOnly(form.parent2Phone.trim()),
+        address: addressSafe(form.address.trim()),
       });
       onClose();
     } catch {
@@ -154,7 +169,7 @@ function StudentDetailsDialog({
                   <Text {...labelProps}>Prezime</Text>
                   <Input
                     value={form.parent1LastName}
-                    onChange={set("parent1LastName")}
+                    onChange={set("parent1LastName", lettersOnly)}
                     {...sharedInputProps}
                   />
                 </Box>
@@ -162,7 +177,7 @@ function StudentDetailsDialog({
                   <Text {...labelProps}>Ime</Text>
                   <Input
                     value={form.parent1FirstName}
-                    onChange={set("parent1FirstName")}
+                    onChange={set("parent1FirstName", lettersOnly)}
                     {...sharedInputProps}
                   />
                 </Box>
@@ -173,7 +188,7 @@ function StudentDetailsDialog({
                   <Input
                     type="tel"
                     value={form.parent1Phone}
-                    onChange={set("parent1Phone")}
+                    onChange={set("parent1Phone", numbersOnly)}
                     {...sharedInputProps}
                   />
                 </Box>
@@ -191,7 +206,7 @@ function StudentDetailsDialog({
                   <Text {...labelProps}>Prezime</Text>
                   <Input
                     value={form.parent2LastName}
-                    onChange={set("parent2LastName")}
+                    onChange={set("parent2LastName", lettersOnly)}
                     {...sharedInputProps}
                   />
                 </Box>
@@ -199,7 +214,7 @@ function StudentDetailsDialog({
                   <Text {...labelProps}>Ime</Text>
                   <Input
                     value={form.parent2FirstName}
-                    onChange={set("parent2FirstName")}
+                    onChange={set("parent2FirstName", lettersOnly)}
                     {...sharedInputProps}
                   />
                 </Box>
@@ -210,7 +225,7 @@ function StudentDetailsDialog({
                   <Input
                     type="tel"
                     value={form.parent2Phone}
-                    onChange={set("parent2Phone")}
+                    onChange={set("parent2Phone", numbersOnly)}
                     {...sharedInputProps}
                   />
                 </Box>
@@ -223,7 +238,7 @@ function StudentDetailsDialog({
                 <Text {...labelProps}>Kućna adresa</Text>
                 <Input
                   value={form.address}
-                  onChange={set("address")}
+                  onChange={set("address", addressSafe)}
                   {...sharedInputProps}
                 />
               </Box>
@@ -334,14 +349,27 @@ export default function Roster() {
   } = useFirestore("students");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [errors, setErrors] = useState<{
+    firstName?: string;
+    lastName?: string;
+  }>({});
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
   const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
   const addStudent = useCallback(async () => {
-    const f = firstName.trim();
-    const l = lastName.trim();
-    if (!f && !l) return;
+    const f = lettersOnly(firstName.trim());
+    const l = lettersOnly(lastName.trim());
+
+    const next: { firstName?: string; lastName?: string } = {};
+    if (!f) next.firstName = "Ime je obavezno.";
+    if (!l) next.lastName = "Prezime je obavezno.";
+    if (next.firstName || next.lastName) {
+      setErrors(next);
+      return;
+    }
+
+    setErrors({});
     await addDocument({ firstName: capitalize(f), lastName: capitalize(l) });
     setFirstName("");
     setLastName("");
@@ -414,11 +442,25 @@ export default function Roster() {
                 Prezime
               </Text>
               <Input
+                required
                 value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                onChange={(e) => {
+                  setLastName(lettersOnly(e.target.value));
+                  if (errors.lastName)
+                    setErrors((prev) => ({ ...prev, lastName: undefined }));
+                }}
                 onKeyDown={handleKeyDown}
                 {...sharedInputProps}
               />
+              {errors.lastName ? (
+                <Text fontSize="xs" color="destructive.fg" mt={1}>
+                  {errors.lastName}
+                </Text>
+              ) : (
+                <Text fontSize="xs" mt={1} visibility="hidden">
+                  &nbsp;
+                </Text>
+              )}
             </Box>
             <Box flex={1}>
               <Text
@@ -433,36 +475,55 @@ export default function Roster() {
                 Ime
               </Text>
               <Input
+                required
                 value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                onChange={(e) => {
+                  setFirstName(lettersOnly(e.target.value));
+                  if (errors.firstName)
+                    setErrors((prev) => ({ ...prev, firstName: undefined }));
+                }}
                 onKeyDown={handleKeyDown}
                 {...sharedInputProps}
               />
+              {errors.firstName ? (
+                <Text fontSize="xs" color="destructive.fg" mt={1}>
+                  {errors.firstName}
+                </Text>
+              ) : (
+                <Text fontSize="xs" mt={1} visibility="hidden">
+                  &nbsp;
+                </Text>
+              )}
             </Box>
 
-            <Button
-              onClick={addStudent}
-              loading={isAddingDocument}
-              rounded="xl"
-              bg="primary.solid"
-              color="primary.contrast"
-              px={5}
-              py={2.5}
-              fontSize="sm"
-              fontWeight="medium"
-              boxShadow="sm"
-              _hover={{ opacity: 0.9 }}
-              _active={{ transform: "scale(0.98)" }}
-              transition="all 0.15s"
-            >
-              <LuPlus style={{ marginRight: "0.375rem" }} />
-              Dodaj
-            </Button>
+            <Box>
+              <Button
+                onClick={addStudent}
+                loading={isAddingDocument}
+                rounded="xl"
+                bg="primary.solid"
+                color="primary.contrast"
+                px={5}
+                py={2.5}
+                fontSize="sm"
+                fontWeight="medium"
+                boxShadow="sm"
+                _hover={{ opacity: 0.9 }}
+                _active={{ transform: "scale(0.98)" }}
+                transition="all 0.15s"
+              >
+                <LuPlus />
+                Dodaj
+              </Button>
+              <Text fontSize="xs" mt={1} visibility="hidden">
+                &nbsp;
+              </Text>
+            </Box>
           </Flex>
         </Box>
 
         {/* Student list */}
-        <Box mt={8}>
+        <Box mt={5}>
           {(() => {
             const sortedRoster = [...roster].sort((a, b) => {
               const last = a.lastName.localeCompare(b.lastName);
