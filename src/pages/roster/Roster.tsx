@@ -369,7 +369,7 @@ export default function Roster() {
           align="end"
           justify="space-between"
           gap={4}
-          pb={6}
+          pb={4}
           borderBottomWidth="1px"
           borderColor="border"
         >
@@ -384,7 +384,6 @@ export default function Roster() {
             </Text>
             <Text
               textStyle="display"
-              mt={2}
               fontSize={{ base: "4xl", sm: "5xl" }}
               fontWeight="semibold"
               letterSpacing="tight"
@@ -396,7 +395,7 @@ export default function Roster() {
         </Flex>
 
         {/* Add student row */}
-        <Box mt={6}>
+        <Box mt={4}>
           <Flex
             direction={{ base: "column", sm: "row" }}
             align={{ base: "stretch", sm: "end" }}
