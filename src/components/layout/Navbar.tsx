@@ -23,6 +23,7 @@ interface Props {
 }
 
 export default function Navbar({ teacherFirstName }: Props) {
+  const navigate = useNavigate();
   const { logout, isPending } = useLogout();
   const {
     deleteAccount,
@@ -32,14 +33,14 @@ export default function Navbar({ teacherFirstName }: Props) {
     isPending: deleteIsPending,
     error: deleteError,
   } = useDeleteAccount(() => navigate("/signin", { replace: true }));
-  const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
-  const isPlanner = location.pathname === "/";
-  const isRoster = location.pathname === "/roster";
-  const isRecords = location.pathname === "/records";
+  const isPlanner =
+    location.pathname === "/planner" || location.pathname === "/planner/";
+  const isRoster = location.pathname === "/planner/roster";
+  const isRecords = location.pathname === "/planner/records";
 
   return (
     <Flex
@@ -95,7 +96,7 @@ export default function Navbar({ teacherFirstName }: Props) {
           p={1}
         >
           <Button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/planner")}
             variant="plain"
             rounded="full"
             px={4}
@@ -111,7 +112,7 @@ export default function Navbar({ teacherFirstName }: Props) {
             Planer
           </Button>
           <Button
-            onClick={() => navigate("/roster")}
+            onClick={() => navigate("/planner/roster")}
             variant="plain"
             rounded="full"
             px={4}
@@ -127,7 +128,7 @@ export default function Navbar({ teacherFirstName }: Props) {
             Razred
           </Button>
           <Button
-            onClick={() => navigate("/records")}
+            onClick={() => navigate("/planner/records")}
             variant="plain"
             rounded="full"
             px={4}
@@ -222,7 +223,7 @@ export default function Navbar({ teacherFirstName }: Props) {
                   <VStack gap={2} align="stretch">
                     <Button
                       onClick={() => {
-                        navigate("/");
+                        navigate("/planner");
                         setMenuOpen(false);
                       }}
                       variant="ghost"
@@ -238,7 +239,7 @@ export default function Navbar({ teacherFirstName }: Props) {
                     </Button>
                     <Button
                       onClick={() => {
-                        navigate("/roster");
+                        navigate("/planner/roster");
                         setMenuOpen(false);
                       }}
                       variant="ghost"
@@ -254,7 +255,7 @@ export default function Navbar({ teacherFirstName }: Props) {
                     </Button>
                     <Button
                       onClick={() => {
-                        navigate("/records");
+                        navigate("/planner/records");
                         setMenuOpen(false);
                       }}
                       variant="ghost"

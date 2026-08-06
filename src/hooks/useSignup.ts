@@ -34,7 +34,7 @@ export const useSignup = () => {
       });
 
       // onAuthStateChanged in AuthContext picks up the new user automatically
-      navigate("/");
+      navigate("/planner");
       setIsPending(false);
     } catch (err) {
       const code = (err as { code?: string }).code;

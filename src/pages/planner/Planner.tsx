@@ -78,7 +78,7 @@ type PlannerNote = {
 // PlannerPage — main component
 // ═══════════════════════════════════════════════════════════════
 
-export default function Home() {
+export default function Planner() {
   const [date, setDate] = useState<Date>(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);

@@ -2,7 +2,8 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AppLayout from "./components/layout/AppLayout";
-import Home from "./pages/home/Home";
+import Home from "./pages/planner/Planner";
+import LandingPage from "./pages/landing/Landing";
 import Roster from "./pages/roster/Roster";
 import RecordsLists from "./pages/records/RecordsLists";
 import Signin from "./pages/login/Signin";
@@ -19,6 +20,11 @@ import CookieBanner from "./components/layout/CookieBanner";
 const router = createBrowserRouter([
   {
     path: "/",
+    errorElement: <ErrorPage />,
+    Component: LandingPage,
+  },
+  {
+    path: "/planner",
     errorElement: <ErrorPage />,
     Component: () => (
       <ProtectedRoute>

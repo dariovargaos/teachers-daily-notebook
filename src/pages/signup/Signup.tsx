@@ -48,10 +48,10 @@ export default function Signup() {
   const { user } = useAuthContext();
   const navigate = useNavigate();
 
-  // Redirect to home once authenticated (handles Google sign-in)
+  // Redirect to planner once authenticated (handles Google sign-in)
   useEffect(() => {
     if (user) {
-      navigate("/", { replace: true });
+      navigate("/planner", { replace: true });
     }
   }, [user, navigate]);
 

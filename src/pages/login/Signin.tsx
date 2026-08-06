@@ -41,10 +41,10 @@ export default function Signin() {
   const { user } = useAuthContext();
   const navigate = useNavigate();
 
-  // Redirect to home once authenticated
+  // Redirect to planner once authenticated
   useEffect(() => {
     if (user) {
-      navigate("/", { replace: true });
+      navigate("/planner", { replace: true });
     }
   }, [user, navigate]);
 
