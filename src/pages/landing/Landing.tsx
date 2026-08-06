@@ -13,27 +13,27 @@ import {
 const FEATURES = [
   {
     icon: LuBookOpen,
-    title: "Daily notes",
+    title: "Dnevne bilješke",
     description:
-      "A clean, dated page for every school day. Write lessons, ideas, and reflections without distraction.",
+      "U dnevnim bilješkama zabilježite lekcije, ispite i podsjetnike. Sve je organizirano po danima i mjesecima.",
   },
   {
     icon: LuCalendarDays,
-    title: "Calendar & reminders",
+    title: "Kalendar i podsjetnici",
     description:
-      "Spot exams and important dates at a glance. Red dots mark days that need your attention.",
+      "Uočite ispite i važne datume na prvi pogled. Crvene točke označavaju dane koji trebaju vašu pažnju.",
   },
   {
     icon: LuUsers,
-    title: "Class roster",
+    title: "Popis učenika",
     description:
-      "Keep your students' first and last names in one tidy list. Add or remove them in seconds.",
+      "Čuvajte imena i prezimena svojih učenika na jednoj urednoj listi. Dodajte ih ili uklonite u sekundi.",
   },
   {
     icon: LuClipboardList,
-    title: "Records",
+    title: "Evidencije",
     description:
-      "Log attendance, grades, and observations per student. Everything in one organised place.",
+      "Uz pomoć prilagodljivih popisa pratite izvršene obaveze učenika kroz cijelu školsku godinu. Evidencije se automatski spremaju.",
   },
 ];
 
@@ -123,10 +123,10 @@ export default function LandingPage() {
             align="center"
             gap={6}
           >
-            {(["Features", "Preview"] as const).map((label) => (
+            {(["Značajke", "Pregled"] as const).map((label) => (
               <Link
                 key={label}
-                href={`#${label.toLowerCase()}`}
+                href={`#${label === "Značajke" ? "features" : "preview"}`}
                 fontSize="sm"
                 fontWeight="medium"
                 color="muted.fg"
@@ -156,7 +156,7 @@ export default function LandingPage() {
               _hover={{ bg: "secondary.solid" }}
               transition="background 0.15s"
             >
-              <RouterLink to="/signin">Sign in</RouterLink>
+              <RouterLink to="/signin">Prijava</RouterLink>
             </Box>
             <Box
               asChild
@@ -176,7 +176,7 @@ export default function LandingPage() {
               _active={{ transform: "scale(0.98)" }}
               boxShadow="0 8px 24px -12px oklch(0.2 0.03 50 / 0.6)"
             >
-              <RouterLink to="/signup">Get started</RouterLink>
+              <RouterLink to="/signup">Započni</RouterLink>
             </Box>
           </Flex>
         </Flex>
@@ -199,7 +199,7 @@ export default function LandingPage() {
             >
               {/* Copy */}
               <Box maxW="xl">
-                <Eyebrow>A planner for modern teachers</Eyebrow>
+                <Eyebrow>Rokovnik za moderne učitelje</Eyebrow>
                 <Text
                   as="h1"
                   textStyle="display"
@@ -209,12 +209,13 @@ export default function LandingPage() {
                   color="fg"
                   lineHeight="1.05"
                 >
-                  A quiet place for loud days.
+                  Mirno mjesto za glasne dane.
                 </Text>
                 <Text mt={6} fontSize="lg" lineHeight="tall" color="muted.fg">
-                  Atelier Planner is a daily notebook and calendar for teachers
-                  who want clarity without clutter. Capture lessons, exams,
-                  reminders, and your class roster in one beautiful place.
+                  e-Rokovnik je aplikacija za učitelje koja pomaže u planiranju
+                  i organizaciji školskih dana. Bilježite lekcije, ispite,
+                  podsjetnike i popis učenika na jednom jasnom i preglednom
+                  mjestu.
                 </Text>
 
                 <Flex mt={8} flexWrap="wrap" align="center" gap={4}>
@@ -236,7 +237,7 @@ export default function LandingPage() {
                     boxShadow="0 18px 40px -20px oklch(0.2 0.05 50 / 0.6)"
                   >
                     <RouterLink to="/signup">
-                      Create your account
+                      Kreiraj račun
                       <LuArrowRight size="1rem" />
                     </RouterLink>
                   </Box>
@@ -258,13 +259,13 @@ export default function LandingPage() {
                     _hover={{ bg: "card.solid" }}
                     transition="background 0.15s"
                   >
-                    <RouterLink to="/signin">Sign in</RouterLink>
+                    <RouterLink to="/signin">Prijava</RouterLink>
                   </Box>
                 </Flex>
 
                 <Text mt={4} fontSize="xs" color="muted.fg/70">
-                  e-Rokovnik is free to use, with no ads or tracking. Your data
-                  is private and secure.
+                  e-Rokovnik je besplatan za korištenje, bez oglasa i praćenja.
+                  Vaši podaci su privatni i sigurni.
                 </Text>
               </Box>
 
@@ -298,7 +299,7 @@ export default function LandingPage() {
                         letterSpacing="0.22em"
                         color="gold"
                       >
-                        Wednesday
+                        Srijeda
                       </Text>
                       <Text
                         as="h2"
@@ -308,7 +309,7 @@ export default function LandingPage() {
                         fontWeight="normal"
                         color="fg"
                       >
-                        September 4
+                        4. rujna
                       </Text>
                       <Text
                         fontFamily="display"
@@ -316,7 +317,7 @@ export default function LandingPage() {
                         fontStyle="italic"
                         color="muted.fg"
                       >
-                        2026
+                        2026.
                       </Text>
                     </Box>
 
@@ -365,7 +366,7 @@ export default function LandingPage() {
                       color="gold"
                       mb={3}
                     >
-                      Teaching Focus
+                      Fokus nastave
                     </Text>
                     <VStack gap={3} align="stretch">
                       {(["75%", "100%", "83%", "50%", "67%"] as const).map(
@@ -396,7 +397,7 @@ export default function LandingPage() {
         >
           <Box mx="auto" maxW="6xl">
             <Box textAlign="center" maxW="2xl" mx="auto" mb={14}>
-              <Eyebrow>Everything you need</Eyebrow>
+              <Eyebrow>Sve što trebate</Eyebrow>
               <Text
                 as="h2"
                 textStyle="display"
@@ -405,7 +406,7 @@ export default function LandingPage() {
                 fontWeight="normal"
                 color="fg"
               >
-                Made for the school year
+                Stvoreno za školsku godinu
               </Text>
             </Box>
 
@@ -486,7 +487,7 @@ export default function LandingPage() {
                     mb={4}
                     textAlign="center"
                   >
-                    {(["M", "T", "W", "T", "F", "S", "S"] as const).map(
+                    {(["P", "U", "S", "Č", "P", "S", "N"] as const).map(
                       (d, i) => (
                         <Text
                           key={i}
@@ -546,7 +547,7 @@ export default function LandingPage() {
                           letterSpacing="0.18em"
                           color="gold"
                         >
-                          Important
+                          Važno
                         </Text>
                         <Text
                           fontFamily="display"
@@ -555,7 +556,7 @@ export default function LandingPage() {
                           color="fg"
                           mt={0.5}
                         >
-                          Exams & reminders
+                          Ispiti i podsjetnici
                         </Text>
                       </Box>
                       <Box
@@ -577,7 +578,7 @@ export default function LandingPage() {
 
               {/* Preview copy */}
               <Box order={{ base: 1, lg: 2 }}>
-                <Eyebrow>Product preview</Eyebrow>
+                <Eyebrow>Pregled proizvoda</Eyebrow>
                 <Text
                   as="h2"
                   textStyle="display"
@@ -586,18 +587,19 @@ export default function LandingPage() {
                   fontWeight="normal"
                   color="fg"
                 >
-                  Your month, at a glance.
+                  Cijeli mjesec na dohvat ruke
                 </Text>
                 <Text mt={5} fontSize="lg" lineHeight="tall" color="muted.fg">
-                  The sidebar calendar keeps your whole month visible. Click any
-                  day to jump to it, and watch red dots appear on days with
-                  exams or reminders.
+                  Kalendar prikazuje cijeli mjesec vidljivim na prvi pogled.
+                  Označite važne datume i podsjetnike, a zatim se jednostavno
+                  prebacite na dnevne bilješke kako biste detaljno planirali
+                  svoj dan.
                 </Text>
                 <VStack mt={6} gap={3} align="start">
                   {[
-                    "Navigate day by day with arrow buttons",
-                    "Jump to any date from the calendar",
-                    "Mark important events with red-dot reminders",
+                    "Krećite se dan po dan pomoću strelica",
+                    "Skočite na bilo koji datum iz kalendara",
+                    "Označite važne događaje crvenim točkama",
                   ].map((line) => (
                     <Flex
                       key={line}
@@ -665,10 +667,11 @@ export default function LandingPage() {
                 fontSize={{ base: "4xl", sm: "5xl" }}
                 fontWeight="normal"
               >
-                Start your notebook today.
+                Započnite svoj rokovnik danas.
               </Text>
               <Text mt={4} fontSize="lg" opacity={0.75}>
-                Join teachers who plan their days with a little more calm.
+                Pridružite se učiteljima koji jednostavno i učinkovito planiraju
+                svoje školske dane.
               </Text>
               <Flex mt={8} flexWrap="wrap" justify="center" gap={4}>
                 <Box
@@ -689,7 +692,7 @@ export default function LandingPage() {
                   boxShadow="0 18px 40px -20px oklch(0.1 0.02 50 / 0.5)"
                 >
                   <RouterLink to="/signup">
-                    Create free account
+                    Kreiraj besplatan račun
                     <LuArrowRight size="1rem" />
                   </RouterLink>
                 </Box>
@@ -711,7 +714,7 @@ export default function LandingPage() {
                   _hover={{ bg: "white/20" }}
                   transition="background 0.15s"
                 >
-                  <RouterLink to="/signin">Sign in</RouterLink>
+                  <RouterLink to="/signin">Prijava</RouterLink>
                 </Box>
               </Flex>
             </Box>
@@ -757,7 +760,7 @@ export default function LandingPage() {
             letterSpacing="0.2em"
             color="muted.fg/70"
           >
-            © {new Date().getFullYear()} e-Rokovnik · All rights reserved
+            © {new Date().getFullYear()} e-Rokovnik · Sva prava pridržana
           </Text>
         </Flex>
       </Box>
