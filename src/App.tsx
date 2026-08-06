@@ -24,7 +24,7 @@ const router = createBrowserRouter([
     Component: LandingPage,
   },
   {
-    path: "/planner",
+    path: "/planer",
     errorElement: <ErrorPage />,
     Component: () => (
       <ProtectedRoute>
@@ -33,23 +33,23 @@ const router = createBrowserRouter([
     ),
     children: [
       { index: true, Component: Home },
-      { path: "roster", Component: Roster },
-      { path: "records", Component: RecordsLists },
+      { path: "razred", Component: Roster },
+      { path: "evidencija", Component: RecordsLists },
       { path: "*", Component: NotFound },
     ],
   },
   {
-    path: "/signin",
+    path: "/prijava",
     errorElement: <ErrorPage />,
     Component: Signin,
   },
   {
-    path: "/signup",
+    path: "/registracija",
     errorElement: <ErrorPage />,
     Component: Signup,
   },
   {
-    path: "/forgot-password",
+    path: "/zaboravljena-lozinka",
     errorElement: <ErrorPage />,
     Component: ForgotPassword,
   },

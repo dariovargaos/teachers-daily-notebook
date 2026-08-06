@@ -44,7 +44,7 @@ export default function Signin() {
   // Redirect to planner once authenticated
   useEffect(() => {
     if (user) {
-      navigate("/planner", { replace: true });
+      navigate("/planer", { replace: true });
     }
   }, [user, navigate]);
 
@@ -226,7 +226,7 @@ export default function Signin() {
               textUnderlineOffset="4px"
               _hover={{ opacity: 0.8 }}
             >
-              <RouterLink to="/signup">Otvori ga</RouterLink>
+              <RouterLink to="/registracija">Otvori ga</RouterLink>
             </Box>
           </Text>
 
@@ -310,7 +310,7 @@ export default function Signin() {
                 color="fg"
                 _hover={{ opacity: 0.8 }}
               >
-                <RouterLink to="/forgot-password">
+                <RouterLink to="/zaboravljena-lozinka">
                   Zaboravljena lozinka?
                 </RouterLink>
               </Box>

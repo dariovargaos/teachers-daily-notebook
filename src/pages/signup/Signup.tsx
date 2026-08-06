@@ -51,7 +51,7 @@ export default function Signup() {
   // Redirect to planner once authenticated (handles Google sign-in)
   useEffect(() => {
     if (user) {
-      navigate("/planner", { replace: true });
+      navigate("/planer", { replace: true });
     }
   }, [user, navigate]);
 
@@ -137,7 +137,7 @@ export default function Signup() {
               textUnderlineOffset="4px"
               _hover={{ opacity: 0.8 }}
             >
-              <RouterLink to="/signin">Prijavi se</RouterLink>
+              <RouterLink to="/prijava">Prijavi se</RouterLink>
             </Box>
           </Text>
 

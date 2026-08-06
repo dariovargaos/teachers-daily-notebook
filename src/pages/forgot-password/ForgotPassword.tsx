@@ -234,7 +234,7 @@ export default function ForgotPassword() {
               </Text>
             </Flex>
 
-            <RouterLink to="/signin">
+            <RouterLink to="/prijava">
               <Button
                 variant="outline"
                 w="full"
@@ -312,7 +312,7 @@ export default function ForgotPassword() {
                 textUnderlineOffset="4px"
                 _hover={{ opacity: 0.8 }}
               >
-                <RouterLink to="/signin">
+                <RouterLink to="/prijava">
                   <LuArrowLeft
                     style={{ display: "inline", verticalAlign: "middle" }}
                   />{" "}

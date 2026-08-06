@@ -145,7 +145,7 @@ export default function ResetPassword() {
                   Lozinka je uspješno promijenjena!
                 </Text>
               </Flex>
-              <RouterLink to="/signin">
+              <RouterLink to="/prijava">
                 <Button
                   colorPalette="primary"
                   w="full"
@@ -316,7 +316,7 @@ export default function ResetPassword() {
             </Text>
           </Flex>
 
-          <RouterLink to="/signin">
+          <RouterLink to="/prijava">
             <Button
               colorPalette="primary"
               w="full"

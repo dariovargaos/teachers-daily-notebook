@@ -156,7 +156,7 @@ export default function LandingPage() {
               _hover={{ bg: "secondary.solid" }}
               transition="background 0.15s"
             >
-              <RouterLink to="/signin">Prijava</RouterLink>
+              <RouterLink to="/prijava">Prijava</RouterLink>
             </Box>
             <Box
               asChild
@@ -176,7 +176,7 @@ export default function LandingPage() {
               _active={{ transform: "scale(0.98)" }}
               boxShadow="0 8px 24px -12px oklch(0.2 0.03 50 / 0.6)"
             >
-              <RouterLink to="/signup">Započni</RouterLink>
+              <RouterLink to="/registracija">Započni</RouterLink>
             </Box>
           </Flex>
         </Flex>
@@ -236,7 +236,7 @@ export default function LandingPage() {
                     _active={{ transform: "scale(0.99)" }}
                     boxShadow="0 18px 40px -20px oklch(0.2 0.05 50 / 0.6)"
                   >
-                    <RouterLink to="/signup">
+                    <RouterLink to="/registracija">
                       Kreiraj račun
                       <LuArrowRight size="1rem" />
                     </RouterLink>
@@ -259,7 +259,7 @@ export default function LandingPage() {
                     _hover={{ bg: "card.solid" }}
                     transition="background 0.15s"
                   >
-                    <RouterLink to="/signin">Prijava</RouterLink>
+                    <RouterLink to="/prijava">Prijava</RouterLink>
                   </Box>
                 </Flex>
 
@@ -691,7 +691,7 @@ export default function LandingPage() {
                   _active={{ transform: "scale(0.99)" }}
                   boxShadow="0 18px 40px -20px oklch(0.1 0.02 50 / 0.5)"
                 >
-                  <RouterLink to="/signup">
+                  <RouterLink to="/registracija">
                     Kreiraj besplatan račun
                     <LuArrowRight size="1rem" />
                   </RouterLink>
@@ -714,7 +714,7 @@ export default function LandingPage() {
                   _hover={{ bg: "white/20" }}
                   transition="background 0.15s"
                 >
-                  <RouterLink to="/signin">Prijava</RouterLink>
+                  <RouterLink to="/prijava">Prijava</RouterLink>
                 </Box>
               </Flex>
             </Box>

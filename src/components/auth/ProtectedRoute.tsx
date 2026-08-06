@@ -21,7 +21,7 @@ export default function ProtectedRoute({ children }: Props) {
 
   // Not signed in — redirect to signin
   if (!user) {
-    return <Navigate to="/signin" replace />;
+    return <Navigate to="/prijava" replace />;
   }
 
   // Authenticated — render the children

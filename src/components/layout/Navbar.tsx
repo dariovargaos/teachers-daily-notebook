@@ -32,15 +32,15 @@ export default function Navbar({ teacherFirstName }: Props) {
     needsReauth,
     isPending: deleteIsPending,
     error: deleteError,
-  } = useDeleteAccount(() => navigate("/signin", { replace: true }));
+  } = useDeleteAccount(() => navigate("/prijava", { replace: true }));
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
   const isPlanner =
-    location.pathname === "/planner" || location.pathname === "/planner/";
-  const isRoster = location.pathname === "/planner/roster";
-  const isRecords = location.pathname === "/planner/records";
+    location.pathname === "/planer" || location.pathname === "/planer/";
+  const isRoster = location.pathname === "/planer/razred";
+  const isRecords = location.pathname === "/planer/evidencija";
 
   return (
     <Flex
@@ -96,7 +96,7 @@ export default function Navbar({ teacherFirstName }: Props) {
           p={1}
         >
           <Button
-            onClick={() => navigate("/planner")}
+            onClick={() => navigate("/planer")}
             variant="plain"
             rounded="full"
             px={4}
@@ -112,7 +112,7 @@ export default function Navbar({ teacherFirstName }: Props) {
             Planer
           </Button>
           <Button
-            onClick={() => navigate("/planner/roster")}
+            onClick={() => navigate("/planer/razred")}
             variant="plain"
             rounded="full"
             px={4}
@@ -128,7 +128,7 @@ export default function Navbar({ teacherFirstName }: Props) {
             Razred
           </Button>
           <Button
-            onClick={() => navigate("/planner/records")}
+            onClick={() => navigate("/planer/evidencija")}
             variant="plain"
             rounded="full"
             px={4}
@@ -223,7 +223,7 @@ export default function Navbar({ teacherFirstName }: Props) {
                   <VStack gap={2} align="stretch">
                     <Button
                       onClick={() => {
-                        navigate("/planner");
+                        navigate("/planer");
                         setMenuOpen(false);
                       }}
                       variant="ghost"
@@ -239,7 +239,7 @@ export default function Navbar({ teacherFirstName }: Props) {
                     </Button>
                     <Button
                       onClick={() => {
-                        navigate("/planner/roster");
+                        navigate("/planer/razred");
                         setMenuOpen(false);
                       }}
                       variant="ghost"
@@ -255,7 +255,7 @@ export default function Navbar({ teacherFirstName }: Props) {
                     </Button>
                     <Button
                       onClick={() => {
-                        navigate("/planner/records");
+                        navigate("/planer/evidencija");
                         setMenuOpen(false);
                       }}
                       variant="ghost"
