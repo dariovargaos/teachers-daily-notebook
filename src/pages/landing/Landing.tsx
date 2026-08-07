@@ -1,6 +1,6 @@
 import { Link as RouterLink } from "react-router";
 import Footer from "@/components/layout/Footer";
-import { Box, Flex, Grid, Link, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, Flex, Grid, Link, Text, VStack } from "@chakra-ui/react";
 import {
   LuArrowRight,
   LuBookOpen,
@@ -109,7 +109,6 @@ export default function LandingPage() {
                 fontFamily="display"
                 fontSize="sm"
                 fontWeight="semibold"
-                letterSpacing="0.18em"
                 color="fg"
               >
                 e-Rokovnik
@@ -142,11 +141,9 @@ export default function LandingPage() {
 
           {/* Auth CTAs */}
           <Flex align="center" gap={2}>
-            <Box
+            <Button
               asChild
-              display="inline-flex"
-              alignItems="center"
-              justifyContent="center"
+              variant="ghost"
               rounded="xl"
               px={4}
               py={2}
@@ -158,13 +155,10 @@ export default function LandingPage() {
               transition="background 0.15s"
             >
               <RouterLink to="/prijava">Prijava</RouterLink>
-            </Box>
-            <Box
+            </Button>
+            <Button
               asChild
-              display="inline-flex"
-              alignItems="center"
-              justifyContent="center"
-              gap={1.5}
+              variant="solid"
               rounded="xl"
               bg="primary.solid"
               px={4}
@@ -178,7 +172,7 @@ export default function LandingPage() {
               boxShadow="0 8px 24px -12px oklch(0.2 0.03 50 / 0.6)"
             >
               <RouterLink to="/registracija">Započni</RouterLink>
-            </Box>
+            </Button>
           </Flex>
         </Flex>
       </Box>
@@ -220,11 +214,9 @@ export default function LandingPage() {
                 </Text>
 
                 <Flex mt={8} flexWrap="wrap" align="center" gap={4}>
-                  <Box
+                  <Button
                     asChild
-                    display="inline-flex"
-                    alignItems="center"
-                    gap={2}
+                    variant="solid"
                     rounded="2xl"
                     bg="primary.solid"
                     px={6}
@@ -241,14 +233,11 @@ export default function LandingPage() {
                       Kreiraj račun
                       <LuArrowRight size="1rem" />
                     </RouterLink>
-                  </Box>
-                  <Box
+                  </Button>
+                  <Button
                     asChild
-                    display="inline-flex"
-                    alignItems="center"
-                    gap={2}
+                    variant="outline"
                     rounded="2xl"
-                    borderWidth="1px"
                     borderColor="border"
                     bg="card.solid/60"
                     px={6}
@@ -261,7 +250,7 @@ export default function LandingPage() {
                     transition="background 0.15s"
                   >
                     <RouterLink to="/prijava">Prijava</RouterLink>
-                  </Box>
+                  </Button>
                 </Flex>
 
                 <Text mt={4} fontSize="xs" color="muted.fg/70">
@@ -431,25 +420,33 @@ export default function LandingPage() {
                   transition="transform 0.2s"
                 >
                   <Flex
-                    h={12}
-                    w={12}
-                    align="center"
-                    justify="center"
-                    rounded="2xl"
-                    bg="primary.solid"
-                    color="primary.contrast"
-                    mb={5}
+                    direction={{ base: "row", sm: "column" }}
+                    align={{ base: "center", sm: "start" }}
+                    gap={{ base: 3, sm: 0 }}
+                    mb={{ base: 3, sm: 0 }}
                   >
-                    <Icon size="1.25rem" />
+                    <Flex
+                      h={12}
+                      w={12}
+                      align="center"
+                      justify="center"
+                      rounded="2xl"
+                      bg="primary.solid"
+                      color="primary.contrast"
+                      mb={{ base: 0, sm: 5 }}
+                      flexShrink={0}
+                    >
+                      <Icon size="1.25rem" />
+                    </Flex>
+                    <Text
+                      textStyle="display"
+                      fontSize="2xl"
+                      fontWeight="normal"
+                      color="fg"
+                    >
+                      {title}
+                    </Text>
                   </Flex>
-                  <Text
-                    textStyle="display"
-                    fontSize="2xl"
-                    fontWeight="normal"
-                    color="fg"
-                  >
-                    {title}
-                  </Text>
                   <Text mt={3} fontSize="sm" lineHeight="tall" color="muted.fg">
                     {description}
                   </Text>
@@ -675,11 +672,9 @@ export default function LandingPage() {
                 svoje školske dane.
               </Text>
               <Flex mt={8} flexWrap="wrap" justify="center" gap={4}>
-                <Box
+                <Button
                   asChild
-                  display="inline-flex"
-                  alignItems="center"
-                  gap={2}
+                  variant="solid"
                   rounded="2xl"
                   bg="primary.contrast"
                   px={6}
@@ -696,14 +691,11 @@ export default function LandingPage() {
                     Kreiraj besplatan račun
                     <LuArrowRight size="1rem" />
                   </RouterLink>
-                </Box>
-                <Box
+                </Button>
+                <Button
                   asChild
-                  display="inline-flex"
-                  alignItems="center"
-                  gap={2}
+                  variant="outline"
                   rounded="2xl"
-                  borderWidth="1px"
                   borderColor="white/25"
                   bg="white/10"
                   px={6}
@@ -716,7 +708,7 @@ export default function LandingPage() {
                   transition="background 0.15s"
                 >
                   <RouterLink to="/prijava">Prijava</RouterLink>
-                </Box>
+                </Button>
               </Flex>
             </Box>
           </Box>
