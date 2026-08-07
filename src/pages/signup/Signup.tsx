@@ -94,26 +94,29 @@ export default function Signup() {
         >
           {/* Mobile logo */}
           <Flex
+            asChild
             w="full"
             display={{ base: "flex", lg: "none" }}
             align="center"
             gap={3}
             mb={6}
           >
-            <Icon
-              bg="primary.solid"
-              borderRadius="xl"
-              p={2}
-              boxSize={10}
-              color="primary.contrast"
-              boxShadow="0 10px 30px -10px oklch(0.2 0.05 50 / 0.6)"
-            >
-              <LuNotebookPen size="1.125rem" />
-            </Icon>
+            <RouterLink to="/" aria-label="Početna stranica">
+              <Icon
+                bg="primary.solid"
+                borderRadius="xl"
+                p={2}
+                boxSize={10}
+                color="primary.contrast"
+                boxShadow="0 10px 30px -10px oklch(0.2 0.05 50 / 0.6)"
+              >
+                <LuNotebookPen size="1.125rem" />
+              </Icon>
 
-            <Text fontFamily="display" fontSize="md" fontWeight="semibold">
-              e-Rokovnik
-            </Text>
+              <Text fontFamily="display" fontSize="md" fontWeight="semibold">
+                e-Rokovnik
+              </Text>
+            </RouterLink>
           </Flex>
 
           <Text
@@ -407,26 +410,32 @@ export default function Signup() {
           />
 
           {/* Logo */}
-          <Box position="relative">
-            <HStack gap={3}>
-              <Flex
-                h={10}
-                w={10}
-                align="center"
-                justify="center"
-                borderRadius="xl"
-                bg="oklch(1 0 0 / 0.18)"
-                borderWidth="1px"
-                borderColor="oklch(1 0 0 / 0.15)"
-              >
-                <LuNotebookPen size="1.125rem" />
-              </Flex>
-              <Box lineHeight="tight">
-                <Text fontFamily="display" fontSize="md" fontWeight="semibold">
-                  e-Rokovnik
-                </Text>
-              </Box>
-            </HStack>
+          <Box asChild position="relative">
+            <RouterLink to="/" aria-label="Početna stranica">
+              <HStack gap={3}>
+                <Flex
+                  h={10}
+                  w={10}
+                  align="center"
+                  justify="center"
+                  borderRadius="xl"
+                  bg="oklch(1 0 0 / 0.18)"
+                  borderWidth="1px"
+                  borderColor="oklch(1 0 0 / 0.15)"
+                >
+                  <LuNotebookPen size="1.125rem" />
+                </Flex>
+                <Box lineHeight="tight">
+                  <Text
+                    fontFamily="display"
+                    fontSize="md"
+                    fontWeight="semibold"
+                  >
+                    e-Rokovnik
+                  </Text>
+                </Box>
+              </HStack>
+            </RouterLink>
           </Box>
 
           {/* Tagline */}

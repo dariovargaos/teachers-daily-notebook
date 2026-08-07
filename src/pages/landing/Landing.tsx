@@ -119,7 +119,7 @@ export default function LandingPage() {
           {/* Desktop nav links */}
           <Flex
             as="nav"
-            display={{ base: "none", sm: "flex" }}
+            display={{ base: "none", md: "flex" }}
             align="center"
             gap={6}
           >
@@ -143,7 +143,7 @@ export default function LandingPage() {
           <Flex align="center" gap={2}>
             <Box
               asChild
-              display={{ base: "none", sm: "inline-flex" }}
+              display="inline-flex"
               alignItems="center"
               justifyContent="center"
               rounded="xl"
@@ -366,7 +366,7 @@ export default function LandingPage() {
                       color="gold"
                       mb={3}
                     >
-                      Fokus nastave
+                      Nastavni fokus
                     </Text>
                     <VStack gap={3} align="stretch">
                       {(["75%", "100%", "83%", "50%", "67%"] as const).map(

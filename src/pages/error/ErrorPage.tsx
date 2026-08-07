@@ -1,8 +1,11 @@
 import { useRouteError, isRouteErrorResponse, Link } from "react-router";
 import { Box, Button, Heading, Text, VStack } from "@chakra-ui/react";
 import { FiHome, FiRefreshCw } from "react-icons/fi";
+import { useAuthContext } from "../../hooks/useAuthContext";
 
 export default function ErrorPage() {
+  const { user } = useAuthContext();
+  const homePath = user ? "/planer" : "/";
   const error = useRouteError();
   const isDev = import.meta.env.DEV;
 
@@ -36,7 +39,7 @@ export default function ErrorPage() {
       </Text>
       <Box display="flex" gap={4} flexWrap="wrap" justifyContent="center">
         <Button asChild colorPalette="primary">
-          <Link to="/">
+          <Link to={homePath}>
             <FiHome />
             Početna
           </Link>
