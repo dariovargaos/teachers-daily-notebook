@@ -1,0 +1,12 @@
+# https://skolski-rokovnik.firebaseapp.com/robots.txt
+User-agent: *
+Allow: /
+
+# Sitemap (optional — add one when you have it)
+# Sitemap: https://skolski-rokovnik.firebaseapp.com/sitemap.xml
+
+# Disallow auth/internal paths from indexing
+Disallow: /prijava
+Disallow: /registracija
+Disallow: /zaboravljena-lozinka
+Disallow: /reset-password

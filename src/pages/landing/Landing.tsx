@@ -78,7 +78,7 @@ export default function LandingPage() {
           rounded="2xl"
           bg="paper/80"
           {...glass}
-          px={5}
+          px={{ base: 1, sm: 4 }}
           py={3}
           align="center"
           justify="space-between"
@@ -89,7 +89,7 @@ export default function LandingPage() {
             asChild
             display="flex"
             alignItems="center"
-            gap={3}
+            gap={2}
             textDecoration="none"
           >
             <RouterLink to="/">

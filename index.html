@@ -2,11 +2,30 @@
 <html lang="hr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/notebook.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Učiteljski e-Rokovnik</title>
 
-    <!--Open Graph (WhatsApp, Facebook, Telegram, etc.) -->
+    <!-- Favicon (modern SVG + legacy fallback) -->
+    <link rel="icon" type="image/svg+xml" href="/notebook.svg" />
+    <link rel="alternate icon" type="image/png" href="/notebook.png" />
+    <link rel="apple-touch-icon" href="/notebook.png" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary meta -->
+    <title>Učiteljski e-Rokovnik — Digitalni rokovnik za učitelje</title>
+    <meta
+      name="description"
+      content="Digitalni rokovnik za učitelje — upravljaj razredom, aktivnostima i bilješkama na jednom mjestu. Besplatno, bez oglasa i praćenja."
+    />
+
+    <!-- SEO / Indexing -->
+    <link rel="canonical" href="https://skolski-rokovnik.firebaseapp.com/" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="e-Rokovnik" />
+
+    <!-- Browser UI theming -->
+    <meta name="theme-color" content="#4e3e2d" />
+
+    <!-- Open Graph (WhatsApp, Facebook, Telegram, etc.) -->
     <meta property="og:type" content="website" />
     <meta
       property="og:url"
@@ -19,13 +38,14 @@
     />
     <meta
       property="og:image"
-      content="https://skolski-rokovnik.firebaseapp.com/notebook.png"
+      content="https://skolski-rokovnik.firebaseapp.com/og-image.png"
     />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="Učiteljski e-Rokovnik" />
+    <meta property="og:locale" content="hr_HR" />
 
-    <!--Twitter Card (for X/Twitter) -->
+    <!-- Twitter Card (X) -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Učiteljski e-Rokovnik" />
     <meta
@@ -34,14 +54,27 @@
     />
     <meta
       name="twitter:image"
-      content="https://skolski-rokovnik.firebaseapp.com/notebook.png"
+      content="https://skolski-rokovnik.firebaseapp.com/og-image.png"
     />
 
-    <!--Standard meta description (for Google Search results) -->
-    <meta
-      name="description"
-      content="Digitalni rokovnik za učitelje — upravljaj razredom, aktivnostima i bilješkama na jednom mjestu."
-    />
+    <!-- Structured data (JSON-LD) — helps Google understand your app -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Učiteljski e-Rokovnik",
+        "url": "https://skolski-rokovnik.firebaseapp.com/",
+        "description": "Digitalni rokovnik za učitelje — upravljaj razredom, aktivnostima i bilješkama na jednom mjestu.",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "All",
+        "inLanguage": "hr",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "EUR"
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
