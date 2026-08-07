@@ -38,13 +38,17 @@ export default function ErrorPage() {
         {message}
       </Text>
       <Box display="flex" gap={4} flexWrap="wrap" justifyContent="center">
-        <Button asChild colorPalette="primary">
+        <Button asChild colorPalette="primary" rounded="lg">
           <Link to={homePath}>
             <FiHome />
             Početna
           </Link>
         </Button>
-        <Button variant="outline" onClick={() => window.location.reload()}>
+        <Button
+          variant="outline"
+          rounded="lg"
+          onClick={() => window.location.reload()}
+        >
           <FiRefreshCw />
           Osvježi stranicu
         </Button>

@@ -1,5 +1,13 @@
 import { useState, useCallback, useMemo } from "react";
-import { Box, Flex, Grid, IconButton, Input, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Grid,
+  IconButton,
+  Input,
+  Spinner,
+  Text,
+} from "@chakra-ui/react";
 import {
   LuBookOpen,
   LuCircleCheck,
@@ -40,6 +48,8 @@ export default function RecordsLists() {
     addDocument: addRecord,
     deleteDocument: deleteRecord,
     updateDocument: updateRecord,
+    deletingDocumentId: deletingRecordId,
+    isAddingDocument: isAddingRecord,
   } = useFirestore("records");
 
   const [newRecordName, setNewRecordName] = useState("");
@@ -192,9 +202,10 @@ export default function RecordsLists() {
                   _hover={{ opacity: 0.85 }}
                   _active={{ transform: "scale(0.95)" }}
                   transition="all 0.15s"
+                  disabled={isAddingRecord}
                   onClick={handleAddRecord}
                 >
-                  <LuPlus />
+                  {isAddingRecord ? <Spinner size="sm" /> : <LuPlus />}
                 </IconButton>
               </Flex>
 
@@ -283,14 +294,20 @@ export default function RecordsLists() {
                         size="2xs"
                         color="muted.contrast/50"
                         _hover={{ color: "red.500" }}
+                        _active={{ color: "red.500" }}
                         transition="color 0.15s"
                         flexShrink={0}
+                        disabled={deletingRecordId === a.id}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteRecord(a.id);
                         }}
                       >
-                        <LuTrash2 />
+                        {deletingRecordId === a.id ? (
+                          <Spinner size="xs" />
+                        ) : (
+                          <LuTrash2 />
+                        )}
                       </IconButton>
                     </Flex>
                   );

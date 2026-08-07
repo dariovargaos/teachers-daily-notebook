@@ -6,6 +6,7 @@ import {
   Grid,
   IconButton,
   Input,
+  Spinner,
   Text,
   Textarea,
 } from "@chakra-ui/react";
@@ -56,9 +57,6 @@ function eventKey(d: Date) {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 }
 
-const notesPerPage = 6;
-const remindersPerPage = 3;
-
 type Reminder = {
   id: string;
   date: string;
@@ -96,12 +94,13 @@ export default function Planner() {
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editNoteText, setEditNoteText] = useState("");
   const [newNoteText, setNewNoteText] = useState("");
-  const [notePage, setNotePage] = useState(0);
 
   const {
     addDocument: addNoteDoc,
     deleteDocument: deleteNoteDoc,
     updateDocument: updateNoteDoc,
+    deletingDocumentId: deletingNoteId,
+    isAddingDocument: isAddingNote,
   } = useFirestore("plannerNotes");
 
   const addNote = useCallback(
@@ -143,7 +142,6 @@ export default function Planner() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const [newReminderText, setNewReminderText] = useState("");
-  const [reminderPage, setReminderPage] = useState(0);
 
   // Derived: Date objects for calendar dots (dates with ≥1 reminder)
   const eventDates = useMemo(
@@ -159,6 +157,8 @@ export default function Planner() {
     addDocument: addReminderDoc,
     deleteDocument: deleteReminderDoc,
     updateDocument: updateReminderDoc,
+    deletingDocumentId: deletingReminderId,
+    isAddingDocument: isAddingReminder,
   } = useFirestore("reminders");
 
   // ── CRUD on the current date's reminders ──
@@ -183,27 +183,10 @@ export default function Planner() {
     [deleteReminderDoc],
   );
 
-  const totalReminderPages =
-    Math.ceil(dateReminders.length / remindersPerPage) || 1;
-  const safePage = Math.min(reminderPage, totalReminderPages - 1);
-  const pagedReminders = dateReminders.slice(
-    safePage * remindersPerPage,
-    (safePage + 1) * remindersPerPage,
-  );
-
-  const totalNotePages = Math.ceil(dateNotes.length / notesPerPage) || 1;
-  const safeNotePage = Math.min(notePage, totalNotePages - 1);
-  const pagedNotes = dateNotes.slice(
-    safeNotePage * notesPerPage,
-    (safeNotePage + 1) * notesPerPage,
-  );
-
   const shiftDay = (delta: number) => {
     const next = new Date(date);
     next.setDate(next.getDate() + delta);
     setDate(next);
-    setReminderPage(0);
-    setNotePage(0);
   };
 
   const weekday = WEEKDAYS[date.getDay()];
@@ -405,6 +388,7 @@ export default function Planner() {
                 aria-label="Dodaj bilješku"
                 flexShrink={0}
                 mt={1}
+                disabled={isAddingNote}
                 onClick={() => {
                   if (newNoteText.trim()) {
                     addNote(newNoteText.trim());
@@ -412,180 +396,163 @@ export default function Planner() {
                   }
                 }}
               >
-                <LuPlus />
+                {isAddingNote ? <Spinner size="xs" /> : <LuPlus />}
               </IconButton>
             </Flex>
 
-            {dateNotes.length === 0 && (
-              <Text fontSize="md" color="fg/30" py={3} fontStyle="italic">
-                Što danas predaješ? Dodaj svoju prvu bilješku iznad…
-              </Text>
-            )}
-
-            {pagedNotes.map((n, i) => (
-              <Flex
-                key={n.id}
-                align="start"
-                gap={3}
-                py={2.5}
-                px={2}
-                mx={-2}
-                borderBottomWidth="1px"
-                borderColor="border/20"
-                minW={0}
-                overflow="hidden"
-                rounded="lg"
-                _hover={{ bg: "secondary.solid/20" }}
-                role="group"
-              >
-                <Text
-                  as="span"
-                  flexShrink={0}
-                  color="primary.solid"
-                  fontSize="sm"
-                  lineHeight="1.8"
-                  minW="18px"
-                  textAlign="right"
-                >
-                  {safeNotePage * notesPerPage + i + 1}.
+            <Box overflowY="auto" overflowX="hidden" maxH="35vh" pr={1}>
+              {dateNotes.length === 0 && (
+                <Text fontSize="md" color="fg/30" py={3} fontStyle="italic">
+                  Što danas predaješ? Dodaj svoju prvu bilješku iznad…
                 </Text>
+              )}
 
-                {editingNoteId === n.id ? (
-                  <>
-                    <Textarea
-                      flex={1}
-                      value={editNoteText}
-                      onChange={(e) => setEditNoteText(e.target.value)}
-                      autoFocus
-                      autoresize
-                      fontSize="md"
-                      lineHeight="relaxed"
-                      color="fg"
-                      p={0}
-                      resize="none"
-                      border={0}
-                      _focus={{ outline: "none", boxShadow: "none" }}
-                      onKeyDown={(e) => {
-                        if (
-                          e.key === "Enter" &&
-                          !e.shiftKey &&
-                          editNoteText.trim()
-                        ) {
-                          e.preventDefault();
-                          updateNote(n.id, editNoteText.trim());
-                          setEditingNoteId(null);
-                        }
-                        if (e.key === "Escape") setEditingNoteId(null);
-                      }}
-                    />
-                    <Flex gap={1} flexShrink={0}>
-                      <IconButton
-                        variant="ghost"
-                        size="2xs"
-                        aria-label="Spremi"
-                        onClick={() => {
-                          if (editNoteText.trim())
+              {dateNotes.map((n, i) => (
+                <Flex
+                  key={n.id}
+                  align="start"
+                  gap={3}
+                  py={2.5}
+                  px={2}
+                  mx={-2}
+                  borderBottomWidth="1px"
+                  borderColor="border/20"
+                  minW={0}
+                  overflow="hidden"
+                  rounded="lg"
+                  _hover={{ bg: "secondary.solid/20" }}
+                  role="group"
+                >
+                  <Text
+                    as="span"
+                    flexShrink={0}
+                    color="primary.solid"
+                    fontSize="sm"
+                    lineHeight="1.8"
+                    minW="18px"
+                    textAlign="right"
+                  >
+                    {i + 1}.
+                  </Text>
+
+                  {editingNoteId === n.id ? (
+                    <>
+                      <Textarea
+                        flex={1}
+                        value={editNoteText}
+                        onChange={(e) => setEditNoteText(e.target.value)}
+                        autoFocus
+                        autoresize
+                        fontSize="md"
+                        lineHeight="relaxed"
+                        color="fg"
+                        p={0}
+                        resize="none"
+                        border={0}
+                        _focus={{ outline: "none", boxShadow: "none" }}
+                        onKeyDown={(e) => {
+                          if (
+                            e.key === "Enter" &&
+                            !e.shiftKey &&
+                            editNoteText.trim()
+                          ) {
+                            e.preventDefault();
                             updateNote(n.id, editNoteText.trim());
-                          setEditingNoteId(null);
+                            setEditingNoteId(null);
+                          }
+                          if (e.key === "Escape") setEditingNoteId(null);
                         }}
+                      />
+                      <Flex gap={1} flexShrink={0}>
+                        <IconButton
+                          variant="ghost"
+                          size="2xs"
+                          aria-label="Spremi"
+                          onClick={() => {
+                            if (editNoteText.trim())
+                              updateNote(n.id, editNoteText.trim());
+                            setEditingNoteId(null);
+                          }}
+                        >
+                          <LuCheck />
+                        </IconButton>
+                        <IconButton
+                          variant="ghost"
+                          size="2xs"
+                          aria-label="Odustani"
+                          onClick={() => setEditingNoteId(null)}
+                        >
+                          <LuX />
+                        </IconButton>
+                      </Flex>
+                    </>
+                  ) : (
+                    <>
+                      <Text
+                        flex={1}
+                        minW={0}
+                        fontSize="md"
+                        lineHeight="relaxed"
+                        color={n.done ? "fg/35" : "fg/85"}
+                        wordBreak="break-word"
+                        textDecoration={n.done ? "line-through" : "none"}
+                        transition="color 0.2s, text-decoration 0.2s"
                       >
-                        <LuCheck />
-                      </IconButton>
-                      <IconButton
-                        variant="ghost"
-                        size="2xs"
-                        aria-label="Odustani"
-                        onClick={() => setEditingNoteId(null)}
+                        {n.text}
+                      </Text>
+                      <Flex
+                        gap={1}
+                        flexShrink={0}
+                        _groupHover={{ opacity: 1 }}
+                        transition="opacity 0.15s"
                       >
-                        <LuX />
-                      </IconButton>
-                    </Flex>
-                  </>
-                ) : (
-                  <>
-                    <Text
-                      flex={1}
-                      minW={0}
-                      fontSize="md"
-                      lineHeight="relaxed"
-                      color={n.done ? "fg/35" : "fg/85"}
-                      wordBreak="break-word"
-                      textDecoration={n.done ? "line-through" : "none"}
-                      transition="color 0.2s, text-decoration 0.2s"
-                    >
-                      {n.text}
-                    </Text>
-                    <Flex
-                      gap={1}
-                      flexShrink={0}
-                      _groupHover={{ opacity: 1 }}
-                      transition="opacity 0.15s"
-                    >
-                      <IconButton
-                        variant="ghost"
-                        size="2xs"
-                        aria-label={
-                          n.done ? "Označi nedovršenim" : "Označi dovršenim"
-                        }
-                        color={n.done ? "green.500" : undefined}
-                        onClick={() => toggleNote(n.id, !!n.done)}
-                      >
-                        <LuCircleCheck />
-                      </IconButton>
-                      <IconButton
-                        variant="ghost"
-                        size="2xs"
-                        aria-label="Uredi"
-                        onClick={() => {
-                          setEditingNoteId(n.id);
-                          setEditNoteText(n.text);
-                        }}
-                      >
-                        <LuPencilLine />
-                      </IconButton>
-                      <IconButton
-                        variant="ghost"
-                        size="2xs"
-                        aria-label="Obriši"
-                        onClick={() => deleteNote(n.id)}
-                      >
-                        <LuTrash2 />
-                      </IconButton>
-                    </Flex>
-                  </>
-                )}
-              </Flex>
-            ))}
+                        <IconButton
+                          variant="ghost"
+                          size="2xs"
+                          aria-label={
+                            n.done ? "Označi nedovršenim" : "Označi dovršenim"
+                          }
+                          color={n.done ? "green.500" : undefined}
+                          onClick={() => toggleNote(n.id, !!n.done)}
+                        >
+                          <LuCircleCheck />
+                        </IconButton>
+                        <IconButton
+                          variant="ghost"
+                          size="2xs"
+                          aria-label="Uredi"
+                          onClick={() => {
+                            setEditingNoteId(n.id);
+                            setEditNoteText(n.text);
+                          }}
+                        >
+                          <LuPencilLine />
+                        </IconButton>
+                        <IconButton
+                          aria-label="Obriši"
+                          variant="ghost"
+                          size="2xs"
+                          color="muted.contrast/50"
+                          _hover={{ color: "red.500" }}
+                          _active={{ color: "red.500" }}
+                          transition="color 0.15s"
+                          flexShrink={0}
+                          disabled={deletingNoteId === n.id}
+                          onClick={() => deleteNote(n.id)}
+                        >
+                          {deletingNoteId === n.id ? (
+                            <Spinner size="xs" />
+                          ) : (
+                            <LuTrash2 />
+                          )}
+                        </IconButton>
+                      </Flex>
+                    </>
+                  )}
+                </Flex>
+              ))}
+            </Box>
           </Flex>
-
-          {/* Notes pagination — pinned to canvas bottom */}
-          {totalNotePages > 1 && (
-            <Flex align="center" justify="space-between" pt={2} pb={1}>
-              <IconButton
-                variant="ghost"
-                size="2xs"
-                aria-label="Prethodna stranica"
-                disabled={safeNotePage === 0}
-                onClick={() => setNotePage((p) => Math.max(0, p - 1))}
-              >
-                <LuChevronLeft />
-              </IconButton>
-              <Text fontSize="10px" color="muted.contrast/70">
-                {safeNotePage + 1} / {totalNotePages}
-              </Text>
-              <IconButton
-                variant="ghost"
-                size="2xs"
-                aria-label="Sljedeća stranica"
-                disabled={safeNotePage >= totalNotePages - 1}
-                onClick={() =>
-                  setNotePage((p) => Math.min(totalNotePages - 1, p + 1))
-                }
-              >
-                <LuChevronRight />
-              </IconButton>
-            </Flex>
-          )}
         </Box>
       </Box>
 
@@ -616,8 +583,6 @@ export default function Planner() {
               const nd = new Date(d);
               nd.setHours(0, 0, 0, 0);
               setDate(nd);
-              setReminderPage(0);
-              setNotePage(0);
             }}
             eventDates={eventDates}
           />
@@ -671,149 +636,128 @@ export default function Planner() {
               </Text>
             )}
 
-            {pagedReminders.map((r) => (
-              <Flex
-                key={r.id}
-                align={editingId === r.id ? "start" : "center"}
-                gap={2}
-                py={1.5}
-                px={1}
-                rounded="lg"
-                minW={0}
-                overflow="hidden"
-                _hover={{ bg: "secondary.solid/30" }}
-                role="group"
-              >
-                <Text
-                  as="span"
-                  flexShrink={0}
-                  color="primary.solid"
-                  fontSize="sm"
-                  lineHeight="1.5"
+            <Box overflowY="auto" overflowX="hidden" maxH="150px">
+              {dateReminders.map((r) => (
+                <Flex
+                  key={r.id}
+                  align={editingId === r.id ? "start" : "center"}
+                  gap={2}
+                  py={1.5}
+                  px={1}
+                  rounded="lg"
+                  minW={0}
+                  overflow="hidden"
+                  _hover={{ bg: "secondary.solid/30" }}
+                  role="group"
                 >
-                  •
-                </Text>
+                  <Text
+                    as="span"
+                    flexShrink={0}
+                    color="primary.solid"
+                    fontSize="sm"
+                    lineHeight="1.5"
+                  >
+                    •
+                  </Text>
 
-                {editingId === r.id ? (
-                  <>
-                    <Textarea
-                      flex={1}
-                      value={editText}
-                      onChange={(e) => setEditText(e.target.value)}
-                      autoFocus
-                      autoresize
-                      fontSize="sm"
-                      color="fg"
-                      p={0}
-                      resize="none"
-                      border={0}
-                      _focus={{ outline: "none", boxShadow: "none" }}
-                      onKeyDown={(e) => {
-                        if (
-                          e.key === "Enter" &&
-                          !e.shiftKey &&
-                          editText.trim()
-                        ) {
-                          e.preventDefault();
-                          updateReminder(r.id, editText.trim());
+                  {editingId === r.id ? (
+                    <>
+                      <Textarea
+                        flex={1}
+                        value={editText}
+                        onChange={(e) => setEditText(e.target.value)}
+                        autoFocus
+                        autoresize
+                        fontSize="sm"
+                        color="fg"
+                        p={0}
+                        resize="none"
+                        border={0}
+                        _focus={{ outline: "none", boxShadow: "none" }}
+                        onKeyDown={(e) => {
+                          if (
+                            e.key === "Enter" &&
+                            !e.shiftKey &&
+                            editText.trim()
+                          ) {
+                            e.preventDefault();
+                            updateReminder(r.id, editText.trim());
+                            setEditingId(null);
+                          }
+                          if (e.key === "Escape") setEditingId(null);
+                        }}
+                      />
+                      <IconButton
+                        variant="ghost"
+                        size="2xs"
+                        aria-label="Spremi"
+                        onClick={() => {
+                          if (editText.trim())
+                            updateReminder(r.id, editText.trim());
                           setEditingId(null);
-                        }
-                        if (e.key === "Escape") setEditingId(null);
-                      }}
-                    />
-                    <IconButton
-                      variant="ghost"
-                      size="2xs"
-                      aria-label="Spremi"
-                      onClick={() => {
-                        if (editText.trim())
-                          updateReminder(r.id, editText.trim());
-                        setEditingId(null);
-                      }}
-                    >
-                      <LuCheck />
-                    </IconButton>
-                    <IconButton
-                      variant="ghost"
-                      size="2xs"
-                      aria-label="Odustani"
-                      onClick={() => setEditingId(null)}
-                    >
-                      <LuX />
-                    </IconButton>
-                  </>
-                ) : (
-                  <>
-                    <Text
-                      flex={1}
-                      minW={0}
-                      fontSize="sm"
-                      color="fg"
-                      wordBreak="break-word"
-                      maxH="4.5em"
-                      overflowY="auto"
-                      css={{ scrollbarWidth: "thin" }}
-                    >
-                      {r.text}
-                    </Text>
-                    <IconButton
-                      variant="ghost"
-                      size="2xs"
-                      aria-label="Uredi"
-                      _groupHover={{ opacity: 1 }}
-                      transition="opacity 0.15s"
-                      onClick={() => {
-                        setEditingId(r.id);
-                        setEditText(r.text);
-                      }}
-                    >
-                      <LuPencilLine />
-                    </IconButton>
-                    <IconButton
-                      variant="ghost"
-                      size="2xs"
-                      aria-label="Obriši"
-                      _groupHover={{ opacity: 1 }}
-                      transition="opacity 0.15s"
-                      onClick={() => deleteReminder(r.id)}
-                    >
-                      <LuTrash2 />
-                    </IconButton>
-                  </>
-                )}
-              </Flex>
-            ))}
-
-            {/* ── Pagination ── */}
-            {totalReminderPages > 1 && (
-              <Flex align="center" justify="space-between" pt={2} pb={1}>
-                <IconButton
-                  variant="ghost"
-                  size="2xs"
-                  aria-label="Prethodna stranica"
-                  disabled={safePage === 0}
-                  onClick={() => setReminderPage((p) => Math.max(0, p - 1))}
-                >
-                  <LuChevronLeft />
-                </IconButton>
-                <Text fontSize="10px" color="muted.contrast/70">
-                  {safePage + 1} / {totalReminderPages}
-                </Text>
-                <IconButton
-                  variant="ghost"
-                  size="2xs"
-                  aria-label="Sljedeća stranica"
-                  disabled={safePage >= totalReminderPages - 1}
-                  onClick={() =>
-                    setReminderPage((p) =>
-                      Math.min(totalReminderPages - 1, p + 1),
-                    )
-                  }
-                >
-                  <LuChevronRight />
-                </IconButton>
-              </Flex>
-            )}
+                        }}
+                      >
+                        <LuCheck />
+                      </IconButton>
+                      <IconButton
+                        variant="ghost"
+                        size="2xs"
+                        aria-label="Odustani"
+                        onClick={() => setEditingId(null)}
+                      >
+                        <LuX />
+                      </IconButton>
+                    </>
+                  ) : (
+                    <>
+                      <Text
+                        flex={1}
+                        minW={0}
+                        fontSize="sm"
+                        color="fg"
+                        wordBreak="break-word"
+                        maxH="4.5em"
+                        overflowY="auto"
+                        css={{ scrollbarWidth: "thin" }}
+                      >
+                        {r.text}
+                      </Text>
+                      <IconButton
+                        variant="ghost"
+                        size="2xs"
+                        aria-label="Uredi"
+                        _groupHover={{ opacity: 1 }}
+                        transition="opacity 0.15s"
+                        onClick={() => {
+                          setEditingId(r.id);
+                          setEditText(r.text);
+                        }}
+                      >
+                        <LuPencilLine />
+                      </IconButton>
+                      <IconButton
+                        aria-label="Obriši"
+                        variant="ghost"
+                        size="2xs"
+                        color="muted.contrast/50"
+                        _hover={{ color: "red.500" }}
+                        transition="color 0.15s"
+                        flexShrink={0}
+                        _groupHover={{ opacity: 1 }}
+                        disabled={deletingReminderId === r.id}
+                        onClick={() => deleteReminder(r.id)}
+                      >
+                        {deletingReminderId === r.id ? (
+                          <Spinner size="xs" />
+                        ) : (
+                          <LuTrash2 />
+                        )}
+                      </IconButton>
+                    </>
+                  )}
+                </Flex>
+              ))}
+            </Box>
 
             {/* ── Add new reminder ── */}
             <Flex align="center" gap={2} py={1.5} px={1} minW={0}>
@@ -854,6 +798,7 @@ export default function Planner() {
                 variant="ghost"
                 size="2xs"
                 aria-label="Dodaj podsjetnik"
+                disabled={isAddingReminder}
                 onClick={() => {
                   if (newReminderText.trim()) {
                     addReminder(newReminderText.trim());
@@ -861,7 +806,7 @@ export default function Planner() {
                   }
                 }}
               >
-                <LuPlus />
+                {isAddingReminder ? <Spinner size="xs" /> : <LuPlus />}
               </IconButton>
             </Flex>
           </Flex>

@@ -1,4 +1,5 @@
 import { Link as RouterLink } from "react-router";
+import Footer from "@/components/layout/Footer";
 import { Box, Flex, Grid, Link, Text, VStack } from "@chakra-ui/react";
 import {
   LuArrowRight,
@@ -723,47 +724,7 @@ export default function LandingPage() {
       </Box>
 
       {/* ── Footer ─────────────────────────────────────────── */}
-      <Box as="footer" px={{ base: 4, sm: 8 }} py={8}>
-        <Flex
-          mx="auto"
-          maxW="6xl"
-          flexDir={{ base: "column", sm: "row" }}
-          align="center"
-          justify="space-between"
-          gap={4}
-        >
-          <Flex align="center" gap={3}>
-            <Flex
-              h={8}
-              w={8}
-              align="center"
-              justify="center"
-              rounded="xl"
-              bg="primary.solid"
-              color="primary.contrast"
-            >
-              <LuNotebookPen size="0.875rem" />
-            </Flex>
-            <Text
-              fontFamily="display"
-              fontSize="sm"
-              fontWeight="semibold"
-              letterSpacing="wide"
-              color="fg"
-            >
-              e-Rokovnik
-            </Text>
-          </Flex>
-          <Text
-            fontSize="11px"
-            textTransform="uppercase"
-            letterSpacing="0.2em"
-            color="muted.fg/70"
-          >
-            © {new Date().getFullYear()} e-Rokovnik · Sva prava pridržana
-          </Text>
-        </Flex>
-      </Box>
+      <Footer />
     </Flex>
   );
 }

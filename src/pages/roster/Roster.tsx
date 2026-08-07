@@ -1,5 +1,15 @@
 import { useState, useCallback } from "react";
-import { Box, Button, Dialog, Flex, Grid, Input, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Dialog,
+  Flex,
+  Grid,
+  IconButton,
+  Input,
+  Spinner,
+  Text,
+} from "@chakra-ui/react";
 import { LuPlus, LuTrash2, LuX } from "react-icons/lu";
 import { useCollection } from "@/hooks/useCollection";
 import { useFirestore } from "@/hooks/useFirestore";
@@ -604,30 +614,27 @@ export default function Roster() {
                         </Text>
                       </Box>
                     </Flex>
-                    <Button
+                    <IconButton
                       onClick={(e) => {
                         e.stopPropagation();
                         removeStudent(student.id);
                       }}
                       aria-label={`Ukloni ${student.lastName} ${student.firstName}`}
-                      className="delete-btn"
-                      loading={deletingDocumentId === student.id}
-                      disabled={deletingDocumentId !== null}
                       variant="ghost"
-                      h={8}
-                      w={8}
-                      minW={0}
-                      p={0}
-                      rounded="lg"
-                      color="muted.contrast"
-                      transition="opacity 0.15s"
-                      _hover={{
-                        bg: "destructive.solid/10",
-                        color: "destructive.fg",
-                      }}
+                      size="2xs"
+                      color="muted.contrast/50"
+                      _hover={{ color: "red.500" }}
+                      _active={{ color: "red.500" }}
+                      transition="color 0.15s"
+                      flexShrink={0}
+                      disabled={deletingDocumentId === student.id}
                     >
-                      <LuTrash2 />
-                    </Button>
+                      {deletingDocumentId === student.id ? (
+                        <Spinner size="xs" />
+                      ) : (
+                        <LuTrash2 />
+                      )}
+                    </IconButton>
                   </Box>
                 ))}
               </Box>
