@@ -4,11 +4,18 @@ import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 
 const WEEKDAY_LABELS = ["Po", "Ut", "Sr", "Če", "Pe", "Su", "Ne"];
 
+interface SchoolBreak {
+  from: Date;
+  to: Date;
+}
+
 interface CalendarProps {
   selected: Date;
   month: Date;
   onSelect: (date: Date) => void;
   eventDates: Date[];
+  holidays?: Date[];
+  schoolBreaks?: SchoolBreak[];
   w?: string;
 }
 
@@ -25,6 +32,8 @@ export default function Calendar({
   month,
   onSelect,
   eventDates,
+  holidays = [],
+  schoolBreaks = [],
   ...rest
 }: CalendarProps) {
   const [viewMonth, setViewMonth] = useState(
@@ -129,6 +138,13 @@ export default function Calendar({
           const isSelected = sameDay(day, selected);
           const isToday = sameDay(day, today);
           const hasEvent = eventDates.some((d) => sameDay(d, day));
+          const isNonWorking =
+            day.getDay() === 0 ||
+            day.getDay() === 6 ||
+            holidays.some((d) => sameDay(d, day));
+          const isSchoolBreak =
+            !isNonWorking &&
+            schoolBreaks.some((b) => day >= b.from && day <= b.to);
 
           return (
             <Box
@@ -153,7 +169,15 @@ export default function Calendar({
               transition="all 0.15s"
               bg={isSelected ? "primary.solid" : "transparent"}
               color={
-                isSelected ? "primary.contrast" : isToday ? "primary.fg" : "fg"
+                isSelected
+                  ? "primary.contrast"
+                  : isToday
+                    ? "primary.fg"
+                    : isNonWorking
+                      ? "oklch(0.62 0.22 25)"
+                      : isSchoolBreak
+                        ? "oklch(0.72 0.17 65)"
+                        : "fg"
               }
               _hover={{
                 bg: isSelected ? "primary.solid" : "secondary.solid",

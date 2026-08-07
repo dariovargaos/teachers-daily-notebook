@@ -57,6 +57,31 @@ function eventKey(d: Date) {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 }
 
+// Croatian public holidays for 2026 and 2027
+// prettier-ignore
+const CROATIAN_HOLIDAYS: Date[] = [
+  new Date(2026, 0, 1),   new Date(2026, 0, 6),
+  new Date(2026, 3, 5),   new Date(2026, 3, 6),
+  new Date(2026, 4, 1),   new Date(2026, 4, 30),
+  new Date(2026, 5, 22),  new Date(2026, 7, 5),
+  new Date(2026, 7, 15),  new Date(2026, 10, 1),
+  new Date(2026, 10, 18), new Date(2026, 11, 25), new Date(2026, 11, 26),
+  new Date(2027, 0, 1),   new Date(2027, 0, 6),
+  new Date(2027, 2, 28),  new Date(2027, 2, 29),
+  new Date(2027, 4, 1),   new Date(2027, 4, 30),
+  new Date(2027, 5, 22),  new Date(2027, 7, 5),
+  new Date(2027, 7, 15),  new Date(2027, 10, 1),
+  new Date(2027, 10, 18), new Date(2027, 11, 25), new Date(2027, 11, 26),
+];
+
+// School break windows for 2026/2027
+const SCHOOL_BREAKS = [
+  { from: new Date(2026, 11, 24), to: new Date(2027, 0, 5) }, // Zimski odmor
+  { from: new Date(2027, 1, 22), to: new Date(2027, 1, 26) }, // Zimski odmor 2
+  { from: new Date(2027, 2, 25), to: new Date(2027, 3, 2) }, // Proljetni odmor
+  { from: new Date(2027, 5, 16), to: new Date(2027, 7, 31) }, // Ljetni odmor
+];
+
 type Reminder = {
   id: string;
   date: string;
@@ -585,6 +610,8 @@ export default function Planner() {
               setDate(nd);
             }}
             eventDates={eventDates}
+            holidays={CROATIAN_HOLIDAYS}
+            schoolBreaks={SCHOOL_BREAKS}
           />
         </Box>
 
